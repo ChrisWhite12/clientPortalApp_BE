@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override');
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3009
 
 const exphbs = require('express-handlebars');
 const Handlebars = require('handlebars')
@@ -39,7 +39,18 @@ mongoose.connect(dbConn, {
 });
 
 // Install middleware
-app.use(cors());
+var whitelist = ['http://localhost:3000']
+
+app.use(cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+}));
 app.use(bodyParser.json());
 app.use(session({
     // resave and saveUninitialized set to false for deprecation warnings

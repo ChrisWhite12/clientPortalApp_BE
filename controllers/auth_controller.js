@@ -1,11 +1,8 @@
 const UserModel = require("../models/user")
 const passport = require('passport')
 
-const registerNew = (req,res) => {
-    res.render('auth/register')
-}
-
-const registerCreate = (req, res) => {
+const register = function (req, res) {
+    
     const newUserHandler = (user) => {
         req.login(user, (err) => {
             if(err){
@@ -17,39 +14,57 @@ const registerCreate = (req, res) => {
 
         })
     }
-
-    const { email, password } = req.body
+    
+    const {email,password} = req.body
     UserModel.create({
         email,
         password
     })
     .then(newUserHandler)
-    
 
+    // User.register(new User({
+    //     email: req.body.email,
+    //     role: req.body.role || 'user'
+    // }), req.body.password, function (err) {
+    //     if (err) {
+    //         console.log(err)
+    //         res.status(500);
+    //         res.json({
+    //             error: err
+    //         });
+    //     } else {
+    //         // Log in the newly registered user
+    //         loginUser(req, res);
+    //     }
+    // });
+};
+
+const logout = function (req, res) {
+    console.log(req)
+    req.logout();
+    console.log('logged out user');
+    console.log('session object:', req.session);
+    console.log('req.user:', req.user);
+    res.sendStatus(200);
 }
 
-const logOut = (req,res) => {
-    req.session.destroy(() => {
-        res.redirect('/')
-    })
-}
+// helper functions
+const authenticate = passport.authenticate('local');
 
-const loginNew = (req,res) => {
-    res.render("auth/login")
-}
+function loginUser(req, res) {
+    // passport.authenticate returns a function that we will call with req, res, and a callback function to execute on success    
 
-const loginCreate = (req,res, next) => {
-    const loginFunc = passport.authenticate('local', {
-       successRedirect: "/",
-       failureRedirect: "/user/login"
-    })
-    loginFunc(req, res, next)
+    authenticate(req, res, function () {
+        console.log('authenticated', req.user.username);
+        console.log('session object:', req.session);
+        console.log('req.user:', req.user);
+        res.status(200);
+        res.json({user: req.user, sessionID: req.sessionID});
+    });
 }
 
 module.exports = {
-    registerNew,
-    registerCreate,
-    logOut,
-    loginCreate,
-    loginNew
-}
+    register,
+    login: loginUser,
+    logout
+};
