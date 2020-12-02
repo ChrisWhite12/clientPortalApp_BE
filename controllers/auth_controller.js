@@ -21,22 +21,6 @@ const register = function (req, res) {
         password
     })
     .then(newUserHandler)
-
-    // User.register(new User({
-    //     email: req.body.email,
-    //     role: req.body.role || 'user'
-    // }), req.body.password, function (err) {
-    //     if (err) {
-    //         console.log(err)
-    //         res.status(500);
-    //         res.json({
-    //             error: err
-    //         });
-    //     } else {
-    //         // Log in the newly registered user
-    //         loginUser(req, res);
-    //     }
-    // });
 };
 
 const logout = function (req, res) {
