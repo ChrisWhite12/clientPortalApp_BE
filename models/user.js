@@ -10,6 +10,10 @@ const User = new Schema({
     password:{
         type: String,
         required: true
+    },
+    resetToken:{
+        type: String,
+        required: false
     }
 })
 

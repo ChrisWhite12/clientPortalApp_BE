@@ -14,7 +14,7 @@ passport.deserializeUser((userId,done) => {
 
 const canLogin = (user, password) => {
     if(user){
-        return user.verifyPasswordSync(password)    //from mongoose-bcrypt
+        return user.verifyPasswordSync(password)    //from mongoose-bcrypt - boolean
     }
     else{
         return false
@@ -25,15 +25,17 @@ const verifyCallback = (email,password,done) => {
     UserModel.findOne({email})
     .then((user) => {
         if(canLogin(user,password)){
-            return done(null, user)
+            return done(null, user)         //success
         }
         else{
-            return done(null,false)
+            return done(null,false)         //unsuccessful
         }
     })
-    .catch(done)
+    .catch(done)                            //error
 }
 
+//set username to email
 const fields = { usernameField: "email"}
 
+//use local strategy
 passport.use(new LocalStrategy(fields, verifyCallback))
