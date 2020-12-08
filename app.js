@@ -5,6 +5,7 @@ const passport = require('passport')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override');
+const fetch = require('node-fetch')
 
 const app = express()
 const port = process.env.PORT || 3009
@@ -15,6 +16,8 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 
 const dbConn = 'mongodb://localhost/clientportal'
 const authRoutes = require('./routes/auth_routes')
+
+require('dotenv').config()
 
 app.use( express.urlencoded( {extended: false }) )
 app.use( express.json() )
@@ -54,7 +57,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(session({
     // resave and saveUninitialized set to false for deprecation warnings
-    secret: "Express is awesome",
+    secret:'express',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -70,8 +73,27 @@ app.use(passport.session());
 app.use(methodOverride('_method'))
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-res.render('pages/dashboard')
+
+
+
+app.get("/", (req,res) => {
+    res.sendStatus(200)
+})
+
+app.get("/api", (req,res) => {
+    console.log('api call')
+
+    fetch("https://cors-anywhere.herokuapp.com/https://api.au2.cliniko.com/v1/appointment_types", {
+        headers: {
+            Accept: "application/json",
+            Authorization: "Basic TVMwMU1URTNNRFE1TXpBek1ESTFOalE1TXpBdGNUWnVlSFp0YWxKMk56Um9NVmRLYmtkS1VrOWtUSFZ0ZDNZMmQzVXpiRmMtYXUyOg==",
+            "User-Agent": "Caity McC (ferguselchancho@gmail.com)"
+        }
+    })
+    .then(data => {
+        console.log(data)
+        res.sendStatus(200)
+    })
 })
 
 app.use('/user', authRoutes)
