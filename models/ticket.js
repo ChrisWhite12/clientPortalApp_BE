@@ -8,11 +8,7 @@ const Ticket = new Schema({
         required: true
     },
     appDate:{
-        type: String,
-        required: true
-    },
-    appTime:{
-        type: String,
+        type: Date,
         required: true
     },
     status:{
@@ -20,7 +16,7 @@ const Ticket = new Schema({
         required: true
     },
     notified:{
-        type: String,
+        type: Boolean,
         required: true
     }
 })

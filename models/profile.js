@@ -4,18 +4,18 @@ const Schema = mongoose.Schema;
 // Define User schema
 const Profile = new Schema({
     firstName:{
-        type: String,
-        required: true
+        type: String
     },
     lastName:{
-        type: String,
-        required: true
+        type: String
     },
     contact:{
-        type: String,
-        required: true
+        type: String
     },
     Address:{
+        type: String
+    },
+    userId:{
         type: String,
         required: true
     }

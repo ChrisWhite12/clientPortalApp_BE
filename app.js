@@ -16,6 +16,8 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 
 const dbConn = 'mongodb://localhost/clientportal'
 const authRoutes = require('./routes/auth_routes')
+const profileRoutes = require('./routes/profile_routes')
+const ticketRoutes = require('./routes/ticket_routes')
 
 require('dotenv').config()
 
@@ -97,7 +99,14 @@ app.get("/api", (req,res) => {
 })
 
 app.use('/user', authRoutes)
+app.use('/ticket', ticketRoutes)
+app.use('/profile', profileRoutes)
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log('listening on port:' + port)
 })
+
+module.exports = {
+    app,
+    server
+}

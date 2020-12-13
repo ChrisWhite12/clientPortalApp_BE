@@ -34,6 +34,10 @@ const register = function (req, res, next) {
                     resetToken: ''
                 })
                 .then(newUserHandler)
+                //get user information from api
+
+                //create new profile
+
             }
             else{
                 res.sendStatus(400)
