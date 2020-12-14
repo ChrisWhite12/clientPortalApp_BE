@@ -12,10 +12,14 @@ const Profile = new Schema({
     contact:{
         type: String
     },
-    Address:{
+    address:{
         type: String
     },
     userId:{
+        type: String,
+        required: true
+    },
+    email:{
         type: String,
         required: true
     }

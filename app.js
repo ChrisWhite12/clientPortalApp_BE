@@ -22,7 +22,7 @@ const ticketRoutes = require('./routes/ticket_routes')
 require('dotenv').config()
 
 app.use( express.urlencoded( {extended: false }) )
-app.use( express.json() )
+// app.use( express.json() )
 
 app.engine('handlebars', exphbs({
     handlebars: allowInsecurePrototypeAccess(Handlebars)

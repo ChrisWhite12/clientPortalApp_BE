@@ -1,15 +1,25 @@
 const ProfileModel = require('../models/profile')
 
-const addProfile = () => {
+const addProfile = function (req){
+    req.body.userId = req.user._id
+    req.body.email = req.user.email
     return new ProfileModel(req.body)
 }
 
 const findProfile = (req) => {
-    return ProfileModel.find({userId: req.params.userId})
+    return ProfileModel.find({userId: req.user._id})
+}
+
+const updateProfile = (req) => {
+    const userId = req.user._id
+    return ProfileModel.findOneAndUpdate({userId: userId}, req.body, {
+        new: true
+    });
 }
 
 
 module.exports = {
     addProfile,
-    findProfile
+    findProfile,
+    updateProfile
 }

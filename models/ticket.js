@@ -18,6 +18,10 @@ const Ticket = new Schema({
     notified:{
         type: Boolean,
         required: true
+    },
+    userId:{
+        type: String,
+        required: true
     }
 })
 

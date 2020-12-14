@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, logout, forgotPassword, resetToken, updateUser} = require('../controllers/auth_controller')
+const { register, login, logout, forgotPassword, resetToken, updateUser} = require('../controllers/auth_controller');
+// const { createProfile } = require('../controllers/profile_controller');
 const { authRedirect } = require('../middleware/auth_mw')
 
 // router.get('/register', authRedirect ,registerNew)

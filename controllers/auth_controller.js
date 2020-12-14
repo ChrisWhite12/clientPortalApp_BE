@@ -43,7 +43,7 @@ const register = function (req, res, next) {
                 res.sendStatus(400)
             }
         })
-    
+    // next()
 };
 
 function logout(req, res) {
