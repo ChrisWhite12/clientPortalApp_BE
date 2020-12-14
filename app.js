@@ -18,6 +18,8 @@ const dbConn = 'mongodb://localhost/clientportal'
 const authRoutes = require('./routes/auth_routes')
 const profileRoutes = require('./routes/profile_routes')
 const ticketRoutes = require('./routes/ticket_routes')
+const apiRoutes = require("./routes/api_routes")
+const { Base64 } = require('js-base64')
 
 require('dotenv').config()
 
@@ -83,21 +85,23 @@ app.get("/", (req,res) => {
 })
 
 app.get("/api", (req,res) => {
+    // console.log(Base64.encode(process.env.API_KEY))
     console.log('api call')
-
-    fetch("https://cors-anywhere.herokuapp.com/https://api.au2.cliniko.com/v1/appointment_types", {
+    fetch("https://api.au2.cliniko.com/v1/appointments", {
         headers: {
             Accept: "application/json",
-            Authorization: "Basic TVMwMU1URTNNRFE1TXpBek1ESTFOalE1TXpBdGNUWnVlSFp0YWxKMk56Um9NVmRLYmtkS1VrOWtUSFZ0ZDNZMmQzVXpiRmMtYXUyOg==",
-            "User-Agent": "Caity McC (ferguselchancho@gmail.com)"
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)"
         }
     })
     .then(data => {
         console.log(data)
-        res.sendStatus(200)
+        res.status(200)
+        res.send(data)
     })
 })
 
+app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)
 app.use('/profile', profileRoutes)

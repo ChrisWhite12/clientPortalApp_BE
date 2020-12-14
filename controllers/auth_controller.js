@@ -1,6 +1,8 @@
 const crypto =require('crypto');
 
 const UserModel = require("../models/user")
+const ProfileModel = require("../models/profile")
+
 const passport = require('passport')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
@@ -11,6 +13,8 @@ const {
 
 const register = function (req, res, next) {
     
+    const {email,password} = req.body
+
     const newUserHandler = (user) => {
         console.log('register new user')
         req.login(user, (err) => {
@@ -18,12 +22,15 @@ const register = function (req, res, next) {
                 next(err)
             }
             else{
+                ProfileModel.create({
+                    email,
+                    userId: user._id
+                })
                 res.redirect('/')
             }
         })
     }
     
-    const {email,password} = req.body
     UserModel.find({email})
         .then((exist_user) => {
             console.log('exist_user',exist_user.length)

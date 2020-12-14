@@ -7,7 +7,7 @@ const addProfile = function (req){
 }
 
 const findProfile = (req) => {
-    return ProfileModel.find({userId: req.user._id})
+    return ProfileModel.findOne({userId: req.user._id})
 }
 
 const updateProfile = (req) => {
