@@ -22,7 +22,7 @@ const readTicket = function(req,res){
 			res.json({
 				error: err.message
 			})
-		}
+        }
         res.send(ticket)
         console.log(ticket)
     })

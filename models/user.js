@@ -11,6 +11,9 @@ const User = new Schema({
         type: String,
         required: true
     },
+    role:{
+        type: String
+    },
     resetToken:{
         type: String,
         required: false

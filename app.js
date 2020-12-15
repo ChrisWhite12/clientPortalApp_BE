@@ -84,23 +84,6 @@ app.get("/", (req,res) => {
     res.sendStatus(200)
 })
 
-app.get("/api", (req,res) => {
-    // console.log(Base64.encode(process.env.API_KEY))
-    console.log('api call')
-    fetch("https://api.au2.cliniko.com/v1/appointments", {
-        headers: {
-            Accept: "application/json",
-            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
-            "User-Agent": "Chris White (chris_white_12@hotmail.com)"
-        }
-    })
-    .then(data => {
-        console.log(data)
-        res.status(200)
-        res.send(data)
-    })
-})
-
 app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)

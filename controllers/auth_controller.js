@@ -38,7 +38,8 @@ const register = function (req, res, next) {
                 UserModel.create({
                     email,
                     password,
-                    resetToken: ''
+                    resetToken: '',
+                    role: ''
                 })
                 .then(newUserHandler)
                 //get user information from api
@@ -164,7 +165,7 @@ function resetToken(req,res){
 }
 
 function updateUser(req,res){
-    console.log('token', req.params.token)
+    // console.log('token', req.params.token)
     //find user
     getUserByEmail(req).exec((err,user) => {
         if (err) {
@@ -172,7 +173,7 @@ function updateUser(req,res){
             res.send("User not found")
         }
         else{
-            if(user && user.resetToken == req.params.token){
+            if(user && req.params.token != '' && user.resetToken == req.params.token){
                 console.log('token matches')
                 UserModel.findOneAndUpdate({"email": req.body.email},{
                     $set:{
@@ -197,12 +198,58 @@ function updateUser(req,res){
             }
         }
     })
-    //hash password
+}
 
-    //update user
+function updateUserAdmin(req,res){
+    // console.log('token', req.params.token)
+    //find user
+    getUserByEmail(req).exec((err,user) => {
+        if (err) {
+            res.status(404)
+            res.send("User not found")
+        }
+        else{
+            if(user && req.body.role){
+                console.log('In update user - role')
+                UserModel.findOneAndUpdate({"email": req.body.email},{
+                    $set:{
+                        role: req.body.role
+                    }
+                }).exec((err,userUpdate) => {
+                    if(err){
+                        console.log('err',err)
+                        res.status(400)
+                        res.send("Error")
+                    }
+                    else{
+                        console.log('updated role')
+                        res.status(200).send("role set")
+                    }
+                })
+            }
+            else{
+                res.status(404)
+                res.send("User not found")
+            }
+        }
+    })
+}
 
-
-
+function readUsers (req,res){
+    UserModel.find()
+    .then((users) => {
+        if(users){
+            console.log(users)
+            res.status(200).send(users)
+        }
+        else{
+            res.status(401).send({message: 'unauthorized'})
+        }
+    })
+    .catch((err) => {
+        console.log(err)
+        res.status(401).send({message: err})
+    })
 }
 
 module.exports = {
@@ -211,5 +258,7 @@ module.exports = {
     logout,
     forgotPassword,
     resetToken,
-    updateUser
+    updateUser,
+    readUsers,
+    updateUserAdmin
 };
