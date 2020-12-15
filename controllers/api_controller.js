@@ -23,7 +23,9 @@ const apiTemplate = (query_val,req,res) => {
 }
 
 const readPatients = (req,res) => {
-    apiTemplate('patients',req,res)
+    console.log(req.user.email)
+    const patient_search = req.user.email ? `?q=email:=${req.user.email}` : '';
+    apiTemplate(`patients${patient_search}`,req,res)
 }
 const readAppointments = (req,res) => {
     apiTemplate('appointment_types',req,res)
