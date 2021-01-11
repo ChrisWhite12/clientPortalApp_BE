@@ -69,7 +69,8 @@ const readPatient = (req,res) => {
 }
 
 const checkUser = (req,res,next) => {
-    fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.email}`, {
+    console.log(req.body.email)
+    fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.body.email}`, {
             headers: {
                 Accept: "application/json",
                 Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
@@ -78,15 +79,16 @@ const checkUser = (req,res,next) => {
         })
         .then(response => response.json())
         .then(pat_data => {
-            if (pat_data.length == 1){
+            console.log(pat_data)
+            if (pat_data.patients.length >= 1){
                 console.log('checkUser - email exists')
                 return next()
             }
             else{
                 console.log('checkUser - no data/ not registered')
-                res.status(500)
+                res.status(400)
                 res.json({
-                    error: 'email not registered with brainTrain'
+                    error: 'Email not registered with Brain Train'
                 })
             }
         })

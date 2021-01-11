@@ -9,7 +9,7 @@ const addTicket = (req) => {
 
 const getAllTickets = () => {
     tickets = TicketModel.find()
-    console.log(tickets)
+    // console.log(tickets)
     return tickets
 }
 

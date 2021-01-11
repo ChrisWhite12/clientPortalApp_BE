@@ -1,85 +1,120 @@
-var { server, app } = require('../app.js')
 const mongoose = require('mongoose');
-const expect = require('expect');
 const { findTicket, getAllTickets } = require('../utils/ticket_utils');
 const Ticket = require('../models/ticket');
 const request = require('supertest')
+var {app} = require('../app')
+
+let chai = require('chai')
+let chaiHttp = require('chai-http')
+let should = chai.should()
 
 const {
     connectToDb,
     disconnectFromDb
 } = require('./config');
 
+describe('main test', () => {
 
+    let ticketId = null;
+    // Use done to deal with asynchronous code - done is called when the hooks completes
+    before((done) => {
+        connectToDb(done);
+    });
 
-describe("example test - running ticket_util", () => {
-    test("example test", () => {
-        expect("string").toBeTruthy();
+    beforeEach(() => {
+        setupData();
     })
-})
 
+    afterEach((done) => {
+        tearDownData().exec(() => done());
+    })
 
-let ticketId = null;
+    after((done) => {
+        disconnectFromDb(done);
+    })
+    
+    describe("example test - running ticket_util.test.js", () => {
+        it("example test", () => {
+            (1).should.equal(1);
+        })
+    })
 
-
-// Use done to deal with asynchronous code - done is called when the hooks completes
-beforeAll((done) => {
-    // Connect to the database (same as we do in app.js)
-    disconnectFromDb(done)
-    connectToDb(done);
-});
-
-// Set up test data before each test
-beforeEach(async function () {
-    // Load a test record in setupData
-    // Use await so we can access the postId, which is used by some tests
-    let ticket = await setupData();
-    ticketId = ticket._id;
-});
-
-// Delete test data after each test
-afterEach((done) => {
-    // Execute the deleteMany query
-    tearDownData().exec(() => done());
-});
-
-afterAll((done) => {
-    disconnectFromDb(done);
-})
-
-describe("getAllTickets should get 1", () => {
-    test("return length of 1", () => {
-        getAllTickets().exec((err,tic) => {
-            expect(Object.keys(tic).length).toBe(1);
+    describe("getAllTickets", () => {
+        it('should have a length of 3', (done) => {
+            getAllTickets().exec((err,tic) => {
+                tic.should.have.length(3)
+            })
             done();
         })
     })
+
+    describe("find tickets", () => {
+        it('should find tickets matching to patient', (done) => {
+            // role = "null"
+            // _id = 1
+            const response = request(app).get('/ticket')
+
+            findTicket(req).exec((err,tic) => {
+                tic.should.have.length(2)
+            })
+            done()
+        })
+        it('should find tickets matching to practitioner', (done) => {
+            // role = 'admin'
+            // email = "chris_white_12@hotmail.com"
+            findTicket(req).exec((err,tic) => {
+                tic.should.have.length(2)
+            })
+            done()
+        })
+    })
+
+    describe("update tickets", () => {
+        it('should update ticket to accept', (done) => {
+            updateTicket(req).exec((err,tic) => {
+                console.log(tic)
+            })
+            done()
+        })
+    })
+
 })
 
-// describe("find by userId", () => {
-//     test("appId should be abc123", () => {
-//         const req = {
-//             params: {
-//                 userId: 1
-//             }
-//         }
-
-//         utilities.findTicket(req).exec((err,tic) => {
-//             expect(tic.appId).toBe('abc123')
-//         })
-//     })
-// })
-
 // Setup and tear down functions
-function setupData() {
-    let testTicket = {};
+async function setupData() {
     date1 = new Date(2021, 1, 1, 8, 0, 0);
-    testTicket.appId = 'abc123';
-    testTicket.userId = 1
-    testTicket.appDate = date1
-    testTicket.status = 'requested'
-    testTicket.notified = false
-    return Ticket.create(testTicket);
+
+
+    let testTickets = [
+        {
+            appId: 'abc111',
+            userId: 1,
+            appDate: date1,
+            status: 'requested',
+            notified: false,
+            practitionerId: 'chris_white_12@hotmail.com'
+        },
+        {
+            appId: 'abc112',
+            userId: 2,
+            appDate: date1,
+            status: 'requested',
+            notified: false,
+            practitionerId: 'chris_white_12@hotmail.com'
+        },
+        {
+            appId: 'abc113',
+            userId: 1,
+            appDate: date1,
+            status: 'requested',
+            notified: false,
+            practitionerId: 'other@practitioner.com'
+        }
+    ];
+
+    for (const tic of testTickets) {
+        await Ticket.create(tic)
+    }
 }
 
 function tearDownData() {

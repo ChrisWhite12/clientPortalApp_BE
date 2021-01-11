@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 // set up connection for test database
 const dbConn = 'mongodb://localhost/clientportal_test'
 
-const connectToDb = function (done) {
+const connectToDb = (done) => {
     // Connect to the database (same as we do in app.js)
+    // mongoose.disconnect()
     mongoose.connect(dbConn, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -17,12 +18,13 @@ const connectToDb = function (done) {
             } else {
                 console.log('Connected to database!');
             }
-            done();
+            done()
         });
 };
 
-const disconnectFromDb = function (done) {
-    mongoose.disconnect(() => done())
+const disconnectFromDb = (done) => {
+    mongoose.disconnect()
+    done()
 };
 
 module.exports = {

@@ -31,7 +31,7 @@ const register = function (req, res, next) {
             }
         })
     }
-    
+
     UserModel.find({email})
         .then((exist_user) => {
             console.log('exist_user',exist_user.length)
@@ -51,7 +51,7 @@ const register = function (req, res, next) {
             else{
                 res.status(400)
                 res.json({
-                    error: 'email already exists'
+                    error: 'Email already exists'
                 })
             }
         })
