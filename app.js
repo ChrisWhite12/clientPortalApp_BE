@@ -10,10 +10,6 @@ const fetch = require('node-fetch')
 const app = express()
 const port = process.env.PORT || 3009
 
-const exphbs = require('express-handlebars');
-const Handlebars = require('handlebars')
-const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access')
-
 const dbConn = 'mongodb://localhost/clientportal'
 const authRoutes = require('./routes/auth_routes')
 const profileRoutes = require('./routes/profile_routes')
@@ -25,11 +21,6 @@ require('dotenv').config()
 
 app.use( express.urlencoded( {extended: false }) )
 // app.use( express.json() )
-
-app.engine('handlebars', exphbs({
-    handlebars: allowInsecurePrototypeAccess(Handlebars)
-}));
-app.set('view engine', 'handlebars');
 
 mongoose.connect(dbConn, {
     useNewUrlParser: true,

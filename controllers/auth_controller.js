@@ -9,7 +9,8 @@ const bcrypt = require('bcrypt')
 
 const {
     getUserByEmail
-} = require('../utils/auth_utils')
+} = require('../utils/auth_utils');
+const { checkUser } = require('./api_controller');
 
 const register = function (req, res, next) {
     
@@ -48,7 +49,10 @@ const register = function (req, res, next) {
 
             }
             else{
-                res.sendStatus(400)
+                res.status(400)
+                res.json({
+                    error: 'email already exists'
+                })
             }
         })
     // next()
