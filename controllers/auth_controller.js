@@ -23,10 +23,6 @@ const register = function (req, res, next) {
                 next(err)
             }
             else{
-                ProfileModel.create({
-                    email,
-                    userId: user._id
-                })
                 res.redirect('/')
             }
         })

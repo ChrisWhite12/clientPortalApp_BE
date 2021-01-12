@@ -9,15 +9,23 @@ const fetch = require('node-fetch')
 
 const app = express()
 const port = process.env.PORT || 3009
+let dbConn = ''
 
-const dbConn = 'mongodb://localhost/clientportal'
 const authRoutes = require('./routes/auth_routes')
-const profileRoutes = require('./routes/profile_routes')
 const ticketRoutes = require('./routes/ticket_routes')
 const apiRoutes = require("./routes/api_routes")
 const { Base64 } = require('js-base64')
 
 require('dotenv').config()
+
+if(process.env.NODE_ENV == 'test'){
+    dbConn = 'mongodb://localhost/clientportal_test'
+    console.log('testing database')
+}
+else{
+    dbConn = 'mongodb://localhost/clientportal'
+    console.log('normal database')
+}
 
 app.use( express.urlencoded( {extended: false }) )
 // app.use( express.json() )
@@ -78,7 +86,6 @@ app.get("/", (req,res) => {
 app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)
-app.use('/profile', profileRoutes)
 
 const server = app.listen(port, () => {
     console.log('listening on port:' + port)

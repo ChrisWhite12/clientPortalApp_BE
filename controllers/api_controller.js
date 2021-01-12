@@ -7,13 +7,7 @@ const readPatient = (req,res) => {
     let patient_out = {}
     if(req.user != undefined){
         console.log(req.user.email)
-        fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.user.email}`, {
-            headers: {
-                Accept: "application/json",
-                Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
-                "User-Agent": "Chris White (chris_white_12@hotmail.com)",
-            }
-        })
+        getPatientByEmail(req)
         .then(response => response.json())
         .then(pat_data => {
             // console.log(pat_data.patients[0].appointments.links.self)
@@ -70,31 +64,51 @@ const readPatient = (req,res) => {
 
 const checkUser = (req,res,next) => {
     console.log(req.body.email)
-    fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.body.email}`, {
-            headers: {
-                Accept: "application/json",
-                Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
-                "User-Agent": "Chris White (chris_white_12@hotmail.com)",
-            }
-        })
-        .then(response => response.json())
-        .then(pat_data => {
-            console.log(pat_data)
-            if (pat_data.patients.length >= 1){
-                console.log('checkUser - email exists')
-                return next()
-            }
-            else{
-                console.log('checkUser - no data/ not registered')
-                res.status(400)
-                res.json({
-                    error: 'Email not registered with Brain Train'
-                })
-            }
-        })
-        .catch((err) => console.log(err))
+    getPatientByEmail(req)
+    .then(response => response.json())
+    .then(pat_data => {
+        console.log(pat_data)
+        if (pat_data.patients.length >= 1){
+            console.log('checkUser - email exists')
+            return next()
+        }
+        else{
+            console.log('checkUser - no data/ not registered')
+            res.status(400)
+            res.json({
+                error: 'Email not registered with Brain Train'
+            })
+        }
+    })
+    .catch((err) => console.log(err))
 }
+
+const updatePatient = (patientInfo) => {
+    fetch(`https://api.au2.cliniko.com/v1/patients/${req.user.id}`, {
+        method: 'PUT',
+        headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        }
+    })
+    .then(res => res.json())
+    .then(data => console.log(data))
+
+}
+
+const getPatientByEmail = (req) => {
+    return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.user.email}`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        }
+    })
+}
+
 module.exports = {
     readPatient,
-    checkUser
+    checkUser,
+    updatePatient
 }

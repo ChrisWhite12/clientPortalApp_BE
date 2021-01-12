@@ -13,7 +13,6 @@ const {
 } = require('./config');
 
 describe('main test', () => {
-    
     describe("example test - running api_controller.test.js", () => {
         it("example test", () => {
             (1).should.equal(1);
@@ -21,31 +20,26 @@ describe('main test', () => {
     })
 
     describe("readPatient", () => {
-        it('should return one patient with an email', (done) => {
+        it('should return one patient with an email', () => {
 
-            done()
         })
-        it('should return the correct length of appointments', (done) => {
+        it('should return the correct length of appointments', () => {
 
-            done()
         })
     })
 
     describe("checkUser", () => {
-        it("should return next() if user in cliniko", (done) => {
+        it("should return next() if user in cliniko", () => {
 
-            done()
         })
-        it("should return error if not registered in cliniko", (done) => {
+        it("should return error if not registered in cliniko", () => {
 
-            done()
         })
     })
 
     describe("updateUser", () => {
-        it("should update user address_1", (done) =>{
+        it("should update user address_1", () =>{
 
-            done()
         })
     })
 

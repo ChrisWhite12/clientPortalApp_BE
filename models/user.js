@@ -17,6 +17,9 @@ const User = new Schema({
     resetToken:{
         type: String,
         required: false
+    },
+    patId:{
+        type: String
     }
 })
 

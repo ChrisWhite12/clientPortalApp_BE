@@ -13,7 +13,6 @@ const {
 } = require('./config');
 
 describe('main test', () => {
-    
     describe("example test - running auth_util.test.js", () => {
         it("example test", () => {
             (1).should.equal(1);
@@ -21,35 +20,29 @@ describe('main test', () => {
     })
 
     describe("getUserByEmail", () => {
-        it('should return on entry from email', (done) => {
+        it('should return on entry from email', () => {
 
-            done()
         })
-        it('should return null from invalid email', (done) => {
+        it('should return null from invalid email', () => {
 
-            done()
         })
     })
 
     describe("isAdmin", () => {
-        it("should return next() if admin", (done) => {
+        it("should return next() if admin", () => {
 
-            done()
         })
-        it("should return 403 status if not admin", (done) => {
+        it("should return 403 status if not admin", () => {
 
-            done()
         })
     })
 
     describe("isLoggedIn", () => {
-        it("should return next() if logged in", (done) => {
+        it("should return next() if logged in", () => {
 
-            done()
         })
-        it("should return 403 status if not logged in", (done) => {
+        it("should return 403 status if not logged in", () => {
 
-            done()
         })
     })
 

@@ -1,6 +1,10 @@
+
+process.env.NODE_ENV = 'test'
+
 const mongoose = require('mongoose');
 const { findTicket, getAllTickets } = require('../utils/ticket_utils');
 const Ticket = require('../models/ticket');
+const User = require('../models/user')
 const request = require('supertest')
 var {app} = require('../app')
 
@@ -12,6 +16,8 @@ const {
     connectToDb,
     disconnectFromDb
 } = require('./config');
+const user = require('../models/user');
+
 
 describe('main test', () => {
 
@@ -26,7 +32,13 @@ describe('main test', () => {
     })
 
     afterEach((done) => {
-        tearDownData().exec(() => done());
+        Ticket.deleteMany()
+        .then(() => console.log('tickets deleted'))
+        .catch(() => console.log('error deleting tickets'))
+        User.deleteMany()
+        .then(() => console.log('users deleted'))
+        .catch(() => console.log('error deleting users'))
+        done()
     })
 
     after((done) => {
@@ -81,30 +93,52 @@ describe('main test', () => {
 })
 
 // Setup and tear down functions
-async function setupData() {
+const setupData = async () => {
     date1 = new Date(2021, 1, 1, 8, 0, 0);
 
+    // create patient user
+    user1 = await User.create({
+        email: 'test@test.com',
+        password: 'testtest',
+        resetToken: '',
+        role: ''
+    })
+
+    // create practitioner user
+    user2 = await User.create({
+        email: 'chris_white_12@hotmail.com',
+        password: 'testtest',
+        resetToken: '',
+        role: 'admin'
+    })
+
+    user3 = await User.create({
+        email: 'user3@test.com',
+        password: 'testtest',
+        resetToken: '',
+        role: ''
+    })
 
     let testTickets = [
         {
             appId: 'abc111',
-            userId: 1,
+            userId: user1._id,
             appDate: date1,
             status: 'requested',
             notified: false,
-            practitionerId: 'chris_white_12@hotmail.com'
+            practitionerId: user2._id
         },
         {
             appId: 'abc112',
-            userId: 2,
+            userId: user3._id,
             appDate: date1,
             status: 'requested',
             notified: false,
-            practitionerId: 'chris_white_12@hotmail.com'
+            practitionerId: user2._id
         },
         {
             appId: 'abc113',
-            userId: 1,
+            userId: user1._id,
             appDate: date1,
             status: 'requested',
             notified: false,
@@ -112,11 +146,10 @@ async function setupData() {
         }
     ];
 
-    for (const tic of testTickets) {
-        await Ticket.create(tic)
-    }
-}
 
-function tearDownData() {
-    return Ticket.deleteMany();
+    for (const tic of testTickets) {
+        temp_tic = await Ticket.create(tic)
+    }
+
+    return [user1, user2, user3]
 }
