@@ -2,7 +2,7 @@
 process.env.NODE_ENV = 'test'
 
 const mongoose = require('mongoose');
-const { findTicket, getAllTickets } = require('../utils/ticket_utils');
+const { findTicket, getAllTickets, updateTicket } = require('../utils/ticket_utils');
 const Ticket = require('../models/ticket');
 const User = require('../models/user')
 const request = require('supertest')
@@ -25,21 +25,24 @@ describe('main test', () => {
     // Use done to deal with asynchronous code - done is called when the hooks completes
     before((done) => {
         connectToDb(done);
-    });
 
-    beforeEach(() => {
-        setupData();
-    })
-
-    afterEach((done) => {
         Ticket.deleteMany()
         .then(() => console.log('tickets deleted'))
         .catch(() => console.log('error deleting tickets'))
         User.deleteMany()
-        .then(() => console.log('users deleted'))
-        .catch(() => console.log('error deleting users'))
-        done()
-    })
+        .then(() => console.log('Users deleted'))
+        .catch(() => console.log('error deleting Users'))
+
+        setupData();
+    });
+
+    // beforeEach(() => {
+    // })
+
+    // afterEach((done) => {
+        
+    //     done()
+    // })
 
     after((done) => {
         disconnectFromDb(done);
@@ -92,12 +95,13 @@ describe('main test', () => {
 
 })
 
+
 // Setup and tear down functions
 const setupData = async () => {
     date1 = new Date(2021, 1, 1, 8, 0, 0);
 
     // create patient user
-    user1 = await User.create({
+    let user1 = await User.create({
         email: 'test@test.com',
         password: 'testtest',
         resetToken: '',
@@ -105,21 +109,30 @@ const setupData = async () => {
     })
 
     // create practitioner user
-    user2 = await User.create({
+    let user2 = await User.create({
         email: 'chris_white_12@hotmail.com',
         password: 'testtest',
         resetToken: '',
         role: 'admin'
     })
 
-    user3 = await User.create({
+    let user3 = await User.create({
         email: 'user3@test.com',
         password: 'testtest',
         resetToken: '',
         role: ''
     })
-
+    
     let testTickets = [
+        
+        {
+            appId: 'abc113',
+            userId: user1._id,
+            appDate: date1,
+            status: 'requested',
+            notified: false,
+            practitionerId: 'other@practitioner.com'
+        },
         {
             appId: 'abc111',
             userId: user1._id,
@@ -135,21 +148,11 @@ const setupData = async () => {
             status: 'requested',
             notified: false,
             practitionerId: user2._id
-        },
-        {
-            appId: 'abc113',
-            userId: user1._id,
-            appDate: date1,
-            status: 'requested',
-            notified: false,
-            practitionerId: 'other@practitioner.com'
         }
     ];
 
 
-    for (const tic of testTickets) {
+    for (let tic of testTickets) {
         temp_tic = await Ticket.create(tic)
     }
-
-    return [user1, user2, user3]
 }

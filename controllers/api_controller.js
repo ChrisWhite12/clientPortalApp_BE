@@ -7,7 +7,7 @@ const readPatient = (req,res) => {
     let patient_out = {}
     if(req.user != undefined){
         console.log(req.user.email)
-        getPatientByEmail(req)
+        getPatientByEmail(req.user.email)
         .then(response => response.json())
         .then(pat_data => {
             // console.log(pat_data.patients[0].appointments.links.self)
@@ -63,42 +63,88 @@ const readPatient = (req,res) => {
 }
 
 const checkUser = (req,res,next) => {
-    console.log(req.body.email)
-    getPatientByEmail(req)
+    getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
         console.log(pat_data)
         if (pat_data.patients.length >= 1){
-            console.log('checkUser - email exists')
+            // console.log(pat_data.patients[0])
+            console.log('checkUser - email exists in cliniko')
+            req.patId = pat_data.patients[0].id 
+            req.role = ''
             return next()
         }
         else{
-            console.log('checkUser - no data/ not registered')
-            res.status(400)
-            res.json({
-                error: 'Email not registered with Brain Train'
-            })
+            
+            getUserByEmail(req.body.email)
+            .then(response => response.json())
+            .then(prac_data => {
+                console.log(prac_data)
+                console.log(prac_data.users[0].id)
+                let user_found = false
+                prac_data.users.forEach(element => {
+                    console.log(element.email)
+                    if(element.email == req.body.email){
+                        console.log('user found')
+                        user_found = true
+                    }
+                });
+                if(user_found){
+                    console.log('checkUser - registered as a practitioner')
+                    req.patId = ''
+                    req.role = 'admin'
+                    return next()
+                }
+                else{
+                    console.log('checkUser - no data/ not registered')
+                    res.status(400)
+                    res.json({
+                        error: 'Email not registered with Brain Train'
+                    })
+                }
+        })
+            .catch((err) => console.log(err))
         }
     })
     .catch((err) => console.log(err))
 }
 
-const updatePatient = (patientInfo) => {
-    fetch(`https://api.au2.cliniko.com/v1/patients/${req.user.id}`, {
+const updatePatient = (req,res) => {
+    console.log('---------------------updating patient--------------')
+    console.log(req.body)
+    console.log(req.user.patId)
+    fetch(`https://api.au2.cliniko.com/v1/patients/${req.user.patId}`, {
         method: 'PUT',
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        },
+        body: JSON.stringify({address_1: '1 test st', address_2: "blah"})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.address_1)
+        res.sendStatus(200)
+    })
+    .catch(err => console.log(err))
+
+}
+
+const getPatientByEmail = (email) => {
+    return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
         headers: {
             Accept: "application/json",
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         }
     })
-    .then(res => res.json())
-    .then(data => console.log(data))
-
 }
 
-const getPatientByEmail = (req) => {
-    return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${req.user.email}`, {
+const getUserByEmail = (email) => {
+    // ?q=email:=${email}
+    return fetch(`https://api.au2.cliniko.com/v1/users`, {
         headers: {
             Accept: "application/json",
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
