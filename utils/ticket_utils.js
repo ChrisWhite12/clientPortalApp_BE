@@ -30,9 +30,14 @@ const updateTicket = (req) => {
     });
 }
 
+const deleteTicket = (req) => {
+    return TicketModel.findByIdAndRemove(req.params.id);
+}
+
 module.exports = {
     getAllTickets,
     findTicket,
     addTicket,
-    updateTicket
+    updateTicket,
+    deleteTicket
 }

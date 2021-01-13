@@ -10,12 +10,13 @@ const bcrypt = require('bcrypt')
 const {
     getUserByEmail
 } = require('../utils/auth_utils');
-const { checkUser } = require('./api_controller');
+const { getPatientByEmail } = require('./api_controller');
 
 const register = function (req, res, next) {
     
     const {email,password} = req.body
-
+    const patId = req.patId
+    const role = req.role
     const newUserHandler = (user) => {
         console.log('register new user')
         req.login(user, (err) => {
@@ -36,13 +37,10 @@ const register = function (req, res, next) {
                     email,
                     password,
                     resetToken: '',
-                    role: ''
+                    role,
+                    patId
                 })
                 .then(newUserHandler)
-                //get user information from api
-
-                //create new profile
-
             }
             else{
                 res.status(400)
@@ -51,6 +49,7 @@ const register = function (req, res, next) {
                 })
             }
         })
+        .catch(err => console.log(err))
     // next()
 };
 
