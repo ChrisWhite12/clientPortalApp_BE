@@ -9,7 +9,7 @@ const addTicket = (req) => {
 
 const getAllTickets = () => {
     tickets = TicketModel.find()
-    // console.log(tickets)
+    // console.log('getTickets - ',tickets)
     return tickets
 }
 
@@ -17,7 +17,7 @@ const findTicket = (req) => {
     console.log('email: '+ req.user.email)
     if(req.user.role == 'admin'){
         console.log('admin')
-        return TicketModel.find({practitionerId: req.user.email})
+        return TicketModel.find({practitionerId: req.user._id})
     }
     else{
         return TicketModel.find({userId: req.user._id})
@@ -25,6 +25,7 @@ const findTicket = (req) => {
 }
 
 const updateTicket = (req) => {
+    console.log('id -> ', req.params)
     return TicketModel.findByIdAndUpdate(req.params.id, req.body, {
         new: true
     });

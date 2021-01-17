@@ -2,7 +2,7 @@
 process.env.NODE_ENV = 'test'
 
 const mongoose = require('mongoose');
-const { findTicket, getAllTickets, updateTicket } = require('../utils/ticket_utils');
+const { findTicket, getAllTickets, updateTicket, deleteTicket } = require('../utils/ticket_utils');
 const Ticket = require('../models/ticket');
 const User = require('../models/user')
 const request = require('supertest')
@@ -17,35 +17,28 @@ const {
     disconnectFromDb
 } = require('./config');
 const user = require('../models/user');
+const { deleteOne } = require('../models/ticket');
 
+var user1 = {}
+var user2 = {}
+var user3 = {}
+var tic1 = {}
+var tic2 = {}
+var tic3 = {}
 
 describe('main test', () => {
-
-    let ticketId = null;
+    
     // Use done to deal with asynchronous code - done is called when the hooks completes
-    before((done) => {
-        connectToDb(done);
+    before(async () => {
+        await connectToDb();
 
-        Ticket.deleteMany()
-        .then(() => console.log('tickets deleted'))
-        .catch(() => console.log('error deleting tickets'))
-        User.deleteMany()
-        .then(() => console.log('Users deleted'))
-        .catch(() => console.log('error deleting Users'))
-
-        setupData();
+        await Ticket.deleteMany()
+        await User.deleteMany()
+        await setupData();
     });
 
-    // beforeEach(() => {
-    // })
-
-    // afterEach((done) => {
-        
-    //     done()
-    // })
-
-    after((done) => {
-        disconnectFromDb(done);
+    after(() => {
+        disconnectFromDb();
     })
     
     describe("example test - running ticket_util.test.js", () => {
@@ -55,41 +48,84 @@ describe('main test', () => {
     })
 
     describe("getAllTickets", () => {
-        it('should have a length of 3', (done) => {
+        it('should have a length of 3', () => {
             getAllTickets().exec((err,tic) => {
+                // console.log(`tic test - ${tic}`)
+                // console.log(`err test - ${err}`)
+
                 tic.should.have.length(3)
+                if(err){
+                    console.log(err)
+                }
             })
-            done();
         })
     })
 
     describe("find tickets", () => {
-        it('should find tickets matching to patient', (done) => {
-            // role = "null"
-            // _id = 1
-            const response = request(app).get('/ticket')
-
+        it('should find tickets matching to patient', () => {
+            // const response = request(app).get('/ticket')
+            const req = {
+                user: {
+                    _id: user1._id,
+                    email: user1.email
+                }
+            }
             findTicket(req).exec((err,tic) => {
                 tic.should.have.length(2)
             })
-            done()
         })
-        it('should find tickets matching to practitioner', (done) => {
-            // role = 'admin'
-            // email = "chris_white_12@hotmail.com"
+        it('should find tickets matching to practitioner', () => {
+            const req = {
+                user: {
+                    _id: user2._id,
+                    email: user2.email,
+                    role: 'admin'
+                }
+            }
             findTicket(req).exec((err,tic) => {
+                // console.log(tic)
                 tic.should.have.length(2)
             })
-            done()
         })
     })
 
     describe("update tickets", () => {
-        it('should update ticket to accept', (done) => {
+        it('should update ticket to accept', () => {
+            const req = {
+                params: {
+                    id: tic1._id
+                },
+                body: {
+                    status: 'accepted'
+                }
+            }
             updateTicket(req).exec((err,tic) => {
-                console.log(tic)
+                
+                if(err){
+                    console.log(err)
+                }
+                else{
+                    console.log('update', tic)
+                }
             })
-            done()
+        })
+    })
+
+    describe("delete tickets", () => {
+        it("should delete a ticket", () => {
+            req = {
+                params: {
+                    id: tic2._id
+                }
+            }
+            deleteTicket(req).exec((err,tic) => {
+                if(err){
+                    console.log(err)
+                }
+                else{
+                    console.log('deleted')
+                }
+            })
         })
     })
 
@@ -101,7 +137,7 @@ const setupData = async () => {
     date1 = new Date(2021, 1, 1, 8, 0, 0);
 
     // create patient user
-    let user1 = await User.create({
+    user1 = await User.create({
         email: 'test@test.com',
         password: 'testtest',
         resetToken: '',
@@ -109,50 +145,45 @@ const setupData = async () => {
     })
 
     // create practitioner user
-    let user2 = await User.create({
+    user2 = await User.create({
         email: 'chris_white_12@hotmail.com',
         password: 'testtest',
         resetToken: '',
         role: 'admin'
     })
 
-    let user3 = await User.create({
+    user3 = await User.create({
         email: 'user3@test.com',
         password: 'testtest',
         resetToken: '',
         role: ''
     })
     
-    let testTickets = [
-        
-        {
-            appId: 'abc113',
-            userId: user1._id,
-            appDate: date1,
-            status: 'requested',
-            notified: false,
-            practitionerId: 'other@practitioner.com'
-        },
-        {
-            appId: 'abc111',
-            userId: user1._id,
-            appDate: date1,
-            status: 'requested',
-            notified: false,
-            practitionerId: user2._id
-        },
-        {
-            appId: 'abc112',
-            userId: user3._id,
-            appDate: date1,
-            status: 'requested',
-            notified: false,
-            practitionerId: user2._id
-        }
-    ];
+    tic1 = await Ticket.create({
+        appId: 'tic1',
+        userId: user1._id,
+        appDate: new Date(2021, 1, 1, 8, 0, 0),
+        status: 'requested',
+        notified: false,
+        practitionerId: 'other@practitioner.com'
+    })
 
+    tic2 = await Ticket.create({
+        appId: 'tic2',
+        userId: user1._id,
+        appDate: new Date(2021, 1, 1, 9, 0, 0),
+        status: 'requested',
+        notified: false,
+        practitionerId: user2._id
+    })
 
-    for (let tic of testTickets) {
-        temp_tic = await Ticket.create(tic)
-    }
+    tic3 = await Ticket.create({
+        appId: 'tic3',
+        userId: user3._id,
+        appDate: new Date(2021, 1, 1, 10, 0, 0),
+        status: 'requested',
+        notified: false,
+        practitionerId: user2._id
+    })
+    // console.log("tic3 - ",tic3)
 }

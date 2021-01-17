@@ -63,8 +63,12 @@ app.use(session({
     secret:'express',
     resave: false,
     saveUninitialized: false,
+    proxy:true,
     cookie: {
-        maxAge: 1800000
+        maxAge: 1800000,
+        secure: true,
+        sameSite: 'none',
+        httpOnly: false
     }
 }));
 
