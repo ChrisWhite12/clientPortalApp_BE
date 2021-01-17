@@ -63,6 +63,7 @@ const readPatient = (req,res) => {
 }
 
 const checkUser = (req,res,next) => {
+    console.log(req.body.email)
     getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
