@@ -23,7 +23,7 @@ if(process.env.NODE_ENV == 'test'){
     console.log('testing database')
 }
 else{
-    dbConn = 'mongodb://localhost/clientportal'
+    dbConn = process.env.MONGODB_URI || 'mongodb://localhost/clientportal'
     console.log('normal database')
 }
 
@@ -45,7 +45,7 @@ mongoose.connect(dbConn, {
 });
 
 // Install middleware
-var whitelist = ['http://localhost:3000']
+var whitelist = ['http://localhost:3000', 'https://evening-falls-81226.herokuapp.com/']
 
 app.use(cors({
     credentials: true,
