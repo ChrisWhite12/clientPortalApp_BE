@@ -51,11 +51,17 @@ var whitelist = ['http://localhost:3000','https://zealous-mcnulty-b23006.netlify
 app.use(cors({
     credentials: true,
     origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS ---**'))
-      }
+
+        const whitelistIndex = whitelist.findIndex((url) => url.includes(origin))
+        console.log("found whitelistIndex", whitelistIndex)
+        callback(null,whitelistIndex > -1)
+
+
+    //   if (whitelist.indexOf(origin) !== -1) {
+    //     callback(null, true)
+    //   } else {
+    //     callback(new Error('Not allowed by CORS ---**'))
+    //   }
     }
 }));
 
