@@ -45,7 +45,7 @@ mongoose.connect(dbConn, {
 });
 
 // Install middleware
-var whitelist = ['http://localhost:3000','https://evening-falls-81226.herokuapp.com/']
+var whitelist = ['http://localhost:3000','https://zealous-mcnulty-b23006.netlify.app/']
 // ----------------- ADD FRONTEND URL
 
 app.use(cors({
@@ -58,6 +58,7 @@ app.use(cors({
       }
     }
 }));
+
 app.use(bodyParser.json());
 app.use(session({
     // resave and saveUninitialized set to false for deprecation warnings
