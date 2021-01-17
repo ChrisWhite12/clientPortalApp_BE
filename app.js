@@ -45,7 +45,8 @@ mongoose.connect(dbConn, {
 });
 
 // Install middleware
-var whitelist = ['http://localhost:3000', 'https://evening-falls-81226.herokuapp.com/']
+var whitelist = ['http://localhost:3000']
+// ----------------- ADD FRONTEND URL
 
 app.use(cors({
     credentials: true,
