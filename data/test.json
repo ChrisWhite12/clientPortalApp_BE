@@ -1,8 +1,2 @@
-{
-    "title": "test1",
-    "desc": "blah"
-}
-{
-    "title": "test2",
-    "desc": "blahblah"
-}
+{"title": "test1","desc": "blah"}
+{"title": "test2","desc": "blahblah"};
