@@ -88,6 +88,11 @@ app.get("/", (req,res) => {
     res.sendStatus(200)
 })
 
+app.get("/test", (req,res) => {
+    res.send({message: "test"})
+    res.status(200)
+})
+
 app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)
