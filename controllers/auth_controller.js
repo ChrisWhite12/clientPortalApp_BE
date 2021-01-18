@@ -7,6 +7,21 @@ const passport = require('passport')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 
+const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: process.env.TEST_EMAIL,
+        pass: process.env.TEST_PASS
+    }
+});
+
+const mailOptions = {
+    from: process.env.TEST_EMAIL,
+    to: `${user.email}`,
+    subject: 'Reset Password'
+}
+
 const {
     getUserByEmail
 } = require('../utils/auth_utils');
@@ -110,19 +125,7 @@ function forgotPassword(req,res){
             })
             console.log(token)
 
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                auth: {
-                    user: process.env.TEST_EMAIL,
-                    pass: process.env.TEST_PASS
-                }
-            });
-
-            const mailOptions = {
-                from: process.env.TEST_EMAIL,
-                to: `${user.email}`,
-                subject: 'Reset Password',
+            mailOptions = {
                 text: `To reset password, click the link below: \n http://localhost:3000/reset_password/${token} \n`
             }
 
@@ -187,6 +190,22 @@ function updateUser(req,res){
                     }
                     else{
                         console.log('updated password')
+                        //send password reset email
+                        mailOptions = {
+                            text: `Your password has been reset for BrainTrain dashboard \n`
+                        }
+            
+                        transporter.sendMail(mailOptions, (err,res) => {
+                            if(err){
+                                console.log(`ERROR: ${err}`)
+                                res.sendStatus(400)
+                            }
+                            else{
+                                // console.log(res)
+                                res.status(200).send({message:'recovery mail sent'})
+                            }
+                        })
+
                         res.status(200).send("password set")
                     }
                 })

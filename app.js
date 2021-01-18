@@ -46,7 +46,6 @@ mongoose.connect(dbConn, {
 
 // Install middleware
 var whitelist = ['http://localhost:3000','https://zealous-mcnulty-b23006.netlify.app/']
-// ----------------- ADD FRONTEND URL
 
 app.use(cors({
     credentials: true,
@@ -83,13 +82,6 @@ app.use(session({
 require("./middleware/passport");
 app.use(passport.initialize());
 app.use(passport.session());
-
-// override with POST having ?_method=DELETE or ?_method=PUT
-// app.use(methodOverride('_method'))
-// app.use(express.static('public'));
-
-
-
 
 app.get("/", (req,res) => {
     res.sendStatus(200)

@@ -36,7 +36,9 @@
     "nodemon": "^2.0.6",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^6.0.1"
+    "passport-local-mongoose": "^6.0.1",
+    "sinon": "^9.2.3",
+    "sinon-chai": "^3.5.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
