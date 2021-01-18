@@ -7,21 +7,6 @@ const passport = require('passport')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-        user: process.env.TEST_EMAIL,
-        pass: process.env.TEST_PASS
-    }
-});
-
-const mailOptions = {
-    from: process.env.TEST_EMAIL,
-    to: `${user.email}`,
-    subject: 'Reset Password'
-}
-
 const {
     getUserByEmail
 } = require('../utils/auth_utils');
@@ -101,7 +86,7 @@ function loginUser(req, res, next) {
 
 function forgotPassword(req,res){
     // console.log(req.body)
-    console.log(req.body.email)
+    // console.log(req.body.email)
 
     getUserByEmail(req).exec((err,user) => {
         if (err) {
@@ -110,10 +95,14 @@ function forgotPassword(req,res){
         }
         else if(user){
             const token = crypto.randomBytes(20).toString('hex')
+            let nowDate = Date.now()
+            let expToken = Date.now() + (100 * 60 * 60)
+            console.log('now - ',nowDate,'expToken - ',expToken)
 
             UserModel.findOneAndUpdate({"email": req.body.email},{
                 $set:{
-                    resetToken: token
+                    resetToken: token,
+                    expireToken: ""
                 }
             }).exec((err,userUpdate) => {
                 if(err){
@@ -123,11 +112,25 @@ function forgotPassword(req,res){
                     console.log('updated user')
                 }
             })
-            console.log(token)
+            // console.log(token)
 
-            mailOptions = {
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.ethereal.email',
+                port: 587,
+                auth: {
+                    user: process.env.TEST_EMAIL,
+                    pass: process.env.TEST_PASS
+                }
+            });
+
+            let mailOptions = {
+                from: process.env.TEST_EMAIL,
+                subject: 'Reset Password',
+                to: `${user.email}`,
                 text: `To reset password, click the link below: \n http://localhost:3000/reset_password/${token} \n`
             }
+
+            // console.log(mailOptions)
 
             transporter.sendMail(mailOptions, (err,res) => {
                 if(err){
@@ -153,7 +156,7 @@ function resetToken(req,res){
     UserModel.findOne({resetToken: req.params.token})
     .then((user) => {
         if(user){
-            console.log(user)
+            // console.log(user)
             res.status(200).send({message: 'link ok'})
         }
         else{
@@ -191,7 +194,20 @@ function updateUser(req,res){
                     else{
                         console.log('updated password')
                         //send password reset email
-                        mailOptions = {
+
+                        const transporter = nodemailer.createTransport({
+                            host: 'smtp.ethereal.email',
+                            port: 587,
+                            auth: {
+                                user: process.env.TEST_EMAIL,
+                                pass: process.env.TEST_PASS
+                            }
+                        });
+
+                        let mailOptions = {
+                            from: process.env.TEST_EMAIL,
+                            subject: 'Reset Password',
+                            to: `${user.email}`,
                             text: `Your password has been reset for BrainTrain dashboard \n`
                         }
             
@@ -257,7 +273,7 @@ function readUsers (req,res){
     UserModel.find()
     .then((users) => {
         if(users){
-            console.log(users)
+            // console.log(users)
             res.status(200).send(users)
         }
         else{

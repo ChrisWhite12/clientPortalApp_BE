@@ -18,6 +18,9 @@ const User = new Schema({
         type: String,
         required: false
     },
+    expireToken:{
+        type: Date,
+    },
     patId:{
         type: String
     }

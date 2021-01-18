@@ -74,7 +74,7 @@ describe('main test', () => {
                 tic.should.have.length(2)
             })
         })
-        it('should find tickets matching to practitioner', () => {
+        it('should find all tickets as admin', () => {
             const req = {
                 user: {
                     _id: user2._id,
@@ -84,7 +84,7 @@ describe('main test', () => {
             }
             findTicket(req).exec((err,tic) => {
                 // console.log(tic)
-                tic.should.have.length(2)
+                tic.should.have.length(3)
             })
         })
     })
@@ -164,8 +164,7 @@ const setupData = async () => {
         userId: user1._id,
         appDate: new Date(2021, 1, 1, 8, 0, 0),
         status: 'requested',
-        notified: false,
-        practitionerId: 'other@practitioner.com'
+        notified: false
     })
 
     tic2 = await Ticket.create({
@@ -173,8 +172,7 @@ const setupData = async () => {
         userId: user1._id,
         appDate: new Date(2021, 1, 1, 9, 0, 0),
         status: 'requested',
-        notified: false,
-        practitionerId: user2._id
+        notified: false
     })
 
     tic3 = await Ticket.create({
@@ -182,8 +180,7 @@ const setupData = async () => {
         userId: user3._id,
         appDate: new Date(2021, 1, 1, 10, 0, 0),
         status: 'requested',
-        notified: false,
-        practitionerId: user2._id
+        notified: false
     })
     // console.log("tic3 - ",tic3)
 }
