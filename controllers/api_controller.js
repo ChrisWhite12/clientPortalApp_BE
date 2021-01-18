@@ -63,6 +63,7 @@ const readPatient = (req,res) => {
 }
 
 const checkUser = (req,res,next) => {
+    console.log(req.body.email)
     getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
@@ -121,7 +122,7 @@ const updatePatient = (req,res) => {
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         },
-        body: JSON.stringify({address_1: '1 test st', address_2: "blah"})
+        body: JSON.stringify(req.body)
     })
     .then(response => response.json())
     .then(data => {
@@ -133,6 +134,7 @@ const updatePatient = (req,res) => {
 }
 
 const getPatientByEmail = (email) => {
+    console.log('ByEmail - ',email)
     return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
         headers: {
             Accept: "application/json",
