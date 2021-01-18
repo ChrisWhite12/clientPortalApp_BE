@@ -95,14 +95,14 @@ function forgotPassword(req,res){
         }
         else if(user){
             const token = crypto.randomBytes(20).toString('hex')
-            let nowDate = Date.now()
-            let expToken = Date.now() + (100 * 60 * 60)
-            console.log('now - ',nowDate,'expToken - ',expToken)
+            let nowDate = new Date(Date.now())
+            let expToken = new Date(Date.now() + (1000 * 60 * 2))
+            console.log('now - ',nowDate.toString(),'expToken - ',expToken.toString())
 
             UserModel.findOneAndUpdate({"email": req.body.email},{
                 $set:{
                     resetToken: token,
-                    expireToken: ""
+                    expireToken: expToken
                 }
             }).exec((err,userUpdate) => {
                 if(err){
@@ -155,8 +155,10 @@ function forgotPassword(req,res){
 function resetToken(req,res){
     UserModel.findOne({resetToken: req.params.token})
     .then((user) => {
-        if(user){
-            // console.log(user)
+        const nowDate = new Date(Date.now())
+        console.log(user.expireToken - nowDate)
+        if(user && ((user.expireToken - nowDate) > 0)){
+            console.log('expToken - ',user.expireToken)
             res.status(200).send({message: 'link ok'})
         }
         else{

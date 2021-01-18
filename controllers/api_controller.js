@@ -122,7 +122,7 @@ const updatePatient = (req,res) => {
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         },
-        body: JSON.stringify({address_1: '1 test st', address_2: "blah"})
+        body: JSON.stringify(req.body)
     })
     .then(response => response.json())
     .then(data => {
