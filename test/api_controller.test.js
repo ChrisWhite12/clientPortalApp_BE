@@ -36,19 +36,4 @@ describe('main test', () => {
         })
     })
 
-    describe("checkUser", () => {
-        it("should return next() if user in cliniko", () => {
-
-        })
-        it("should return error if not registered in cliniko", () => {
-
-        })
-    })
-
-    describe("updateUser", () => {
-        it("should update user address_1", () =>{
-
-        })
-    })
-
 })
