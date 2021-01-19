@@ -22,10 +22,6 @@ const Ticket = new Schema({
     userId:{
         type: String,
         required: true
-    },
-    practitionerId:{
-        type: String,
-        required: true
     }
 })
 

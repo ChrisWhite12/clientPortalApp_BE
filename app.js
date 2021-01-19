@@ -23,7 +23,7 @@ if(process.env.NODE_ENV == 'test'){
     console.log('testing database')
 }
 else{
-    dbConn = 'mongodb://localhost/clientportal'
+    dbConn = process.env.MONGODB_URI || 'mongodb://localhost/clientportal'
     console.log('normal database')
 }
 
@@ -45,26 +45,29 @@ mongoose.connect(dbConn, {
 });
 
 // Install middleware
-var whitelist = ['http://localhost:3000']
+var whitelist = ['http://localhost:3000','https://zealous-mcnulty-b23006.netlify.app/']
 
 app.use(cors({
     credentials: true,
     origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
+        const whitelistIndex = whitelist.findIndex((url) => url.includes(origin))
+        console.log("found whitelistIndex", whitelistIndex)
+        callback(null,whitelistIndex > -1)
     }
 }));
+
 app.use(bodyParser.json());
 app.use(session({
     // resave and saveUninitialized set to false for deprecation warnings
     secret:'express',
     resave: false,
     saveUninitialized: false,
+    proxy:true,
     cookie: {
-        maxAge: 1800000
+        maxAge: 1800000,
+        secure: true,
+        sameSite: 'none',
+        httpOnly: false
     }
 }));
 
@@ -72,15 +75,13 @@ require("./middleware/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// override with POST having ?_method=DELETE or ?_method=PUT
-// app.use(methodOverride('_method'))
-// app.use(express.static('public'));
-
-
-
-
 app.get("/", (req,res) => {
     res.sendStatus(200)
+})
+
+app.get("/test", (req,res) => {
+    res.send({message: "test"})
+    res.status(200)
 })
 
 app.use('/api', apiRoutes)

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // set up connection for test database
 const dbConn = 'mongodb://localhost/clientportal_test'
 
-const connectToDb = (done) => {
+const connectToDb = () => {
     // Connect to the database (same as we do in app.js)
     // mongoose.disconnect()
     mongoose.connect(dbConn, {
@@ -18,13 +18,11 @@ const connectToDb = (done) => {
             } else {
                 console.log('Connected to database!');
             }
-            done()
         });
 };
 
-const disconnectFromDb = (done) => {
+const disconnectFromDb = () => {
     mongoose.disconnect()
-    done()
 };
 
 module.exports = {

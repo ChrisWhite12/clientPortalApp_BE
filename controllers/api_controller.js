@@ -63,6 +63,7 @@ const readPatient = (req,res) => {
 }
 
 const checkUser = (req,res,next) => {
+    console.log(req.body.email)
     getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
@@ -133,6 +134,7 @@ const updatePatient = (req,res) => {
 }
 
 const getPatientByEmail = (email) => {
+    console.log('ByEmail - ',email)
     return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
         headers: {
             Accept: "application/json",

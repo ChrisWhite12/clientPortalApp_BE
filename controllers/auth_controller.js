@@ -86,7 +86,7 @@ function loginUser(req, res, next) {
 
 function forgotPassword(req,res){
     // console.log(req.body)
-    console.log(req.body.email)
+    // console.log(req.body.email)
 
     getUserByEmail(req).exec((err,user) => {
         if (err) {
@@ -95,10 +95,14 @@ function forgotPassword(req,res){
         }
         else if(user){
             const token = crypto.randomBytes(20).toString('hex')
+            let nowDate = new Date(Date.now())
+            let expToken = new Date(Date.now() + (1000 * 60 * 2))
+            console.log('now - ',nowDate.toString(),'expToken - ',expToken.toString())
 
             UserModel.findOneAndUpdate({"email": req.body.email},{
                 $set:{
-                    resetToken: token
+                    resetToken: token,
+                    expireToken: expToken
                 }
             }).exec((err,userUpdate) => {
                 if(err){
@@ -108,7 +112,7 @@ function forgotPassword(req,res){
                     console.log('updated user')
                 }
             })
-            console.log(token)
+            // console.log(token)
 
             const transporter = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
@@ -119,12 +123,14 @@ function forgotPassword(req,res){
                 }
             });
 
-            const mailOptions = {
+            let mailOptions = {
                 from: process.env.TEST_EMAIL,
-                to: `${user.email}`,
                 subject: 'Reset Password',
+                to: `${user.email}`,
                 text: `To reset password, click the link below: \n http://localhost:3000/reset_password/${token} \n`
             }
+
+            // console.log(mailOptions)
 
             transporter.sendMail(mailOptions, (err,res) => {
                 if(err){
@@ -149,8 +155,10 @@ function forgotPassword(req,res){
 function resetToken(req,res){
     UserModel.findOne({resetToken: req.params.token})
     .then((user) => {
-        if(user){
-            console.log(user)
+        const nowDate = new Date(Date.now())
+        console.log(user.expireToken - nowDate)
+        if(user && ((user.expireToken - nowDate) > 0)){
+            console.log('expToken - ',user.expireToken)
             res.status(200).send({message: 'link ok'})
         }
         else{
@@ -187,6 +195,35 @@ function updateUser(req,res){
                     }
                     else{
                         console.log('updated password')
+                        //send password reset email
+
+                        const transporter = nodemailer.createTransport({
+                            host: 'smtp.ethereal.email',
+                            port: 587,
+                            auth: {
+                                user: process.env.TEST_EMAIL,
+                                pass: process.env.TEST_PASS
+                            }
+                        });
+
+                        let mailOptions = {
+                            from: process.env.TEST_EMAIL,
+                            subject: 'Reset Password',
+                            to: `${user.email}`,
+                            text: `Your password has been reset for BrainTrain dashboard \n`
+                        }
+            
+                        transporter.sendMail(mailOptions, (err,res) => {
+                            if(err){
+                                console.log(`ERROR: ${err}`)
+                                res.sendStatus(400)
+                            }
+                            else{
+                                // console.log(res)
+                                res.status(200).send({message:'recovery mail sent'})
+                            }
+                        })
+
                         res.status(200).send("password set")
                     }
                 })
@@ -238,7 +275,7 @@ function readUsers (req,res){
     UserModel.find()
     .then((users) => {
         if(users){
-            console.log(users)
+            // console.log(users)
             res.status(200).send(users)
         }
         else{
