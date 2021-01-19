@@ -19,18 +19,24 @@ const {
     disconnectFromDb
 } = require('./config');
 
-describe('main test', () => {
+describe('auth_utils', () => {
 
-    before(async () => {
-        await connectToDb();
+    before((done) => {
+        connectToDb(done);
 
+        // Ticket.deleteMany()
+        // User.deleteMany()
+        // setupData();
+    });
+
+    beforeEach(async () => {
         await Ticket.deleteMany()
         await User.deleteMany()
         await setupData();
-    });
+    })
 
-    after(() => {
-        disconnectFromDb();
+    after((done) => {
+        disconnectFromDb(done);
     })
 
 
@@ -41,13 +47,13 @@ describe('main test', () => {
     })
 
     describe("getUserByEmail", () => {
-        it('should return on entry from email', () => {
+        it('should return on entry from email', async() => {
             req = {
                 body: {
                     email: "test@test.com"
                 }
             }
-            getUserByEmail(req).exec((err,user) => {
+            await getUserByEmail(req).exec((err,user) => {
                 if(err){
                     console.log(err)
                 }
@@ -109,11 +115,11 @@ describe('main test', () => {
 
 })
 
-const setupData = async () => {
+const setupData = () => {
     date1 = new Date(2021, 1, 1, 8, 0, 0);
 
     // create patient user
-    user1 = await User.create({
+    return User.create({
         email: 'test@test.com',
         password: 'testtest',
         resetToken: '',

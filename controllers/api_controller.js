@@ -3,12 +3,16 @@ const fetch = require('node-fetch')
 const { Base64 } = require('js-base64')
 const { response } = require('express')
 
-const readPatient = (req,res) => {
+const readPatient = async (req,res) => {
     let patient_out = {}
+    console.log(req.session)
+
+
     if(req.user != undefined){
         console.log(req.user.email)
-        getPatientByEmail(req.user.email)
+        await getPatientByEmail(req.user.email)
         .then(response => response.json())
+        // .then((x) => console.log('In then',x))
         .then(pat_data => {
             // console.log(pat_data.patients[0].appointments.links.self)
             const curr_date = new Date(Date.now()).toJSON()
@@ -24,6 +28,7 @@ const readPatient = (req,res) => {
                     }
                 })
                 .then(app_res => app_res.json())
+                // .then((x) => console.log('app',x))
                 .then(app_data => {
                     // fetch(app_data.appointments[0].links.self, {
                     //     headers: {
@@ -37,15 +42,15 @@ const readPatient = (req,res) => {
                         patient: pat_data.patients[0],
                         appointments: app_data.appointments
                     }
+                    console.log('PATIENT OUT',patient_out)
                     res.status(200);
-                    console.log(patient_out)
                     res.send(patient_out)
                 }
                 )
                 .catch((err) => console.log(err))
             }
             else{
-                console.log('no user found')
+                console.log('no user found ----')
                 patient_out = {
                     patient: 'null',
                     appointments: []
@@ -54,17 +59,18 @@ const readPatient = (req,res) => {
                 res.send(patient_out)
             }
         })
-        .catch((err) => console.log(err))
+        .catch((err) => console.log('ERROR',err))
     }
     else{
         console.log('no user defined')
+        // console.log(res)
         res.sendStatus(400)
     }
 }
 
-const checkUser = (req,res,next) => {
+const checkUser = async (req,res,next) => {
     console.log(req.body.email)
-    getPatientByEmail(req.body.email)
+    await getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
         console.log(pat_data)
@@ -133,9 +139,10 @@ const updatePatient = (req,res) => {
 
 }
 
-const getPatientByEmail = (email) => {
+const getPatientByEmail = async (email) => {
     console.log('ByEmail - ',email)
-    return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
+    console.log('In get patientByemail')
+    return await fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
         headers: {
             Accept: "application/json",
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
@@ -144,9 +151,9 @@ const getPatientByEmail = (email) => {
     })
 }
 
-const getUserByEmail = (email) => {
+const getUserByEmail = async(email) => {
     // ?q=email:=${email}
-    return fetch(`https://api.au2.cliniko.com/v1/users`, {
+    return await fetch(`https://api.au2.cliniko.com/v1/users`, {
         headers: {
             Accept: "application/json",
             Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,

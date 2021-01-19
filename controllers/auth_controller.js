@@ -19,6 +19,8 @@ const register = function (req, res, next) {
     const role = req.role
     const newUserHandler = (user) => {
         console.log('register new user')
+        console.log('e,p', email,password)
+        console.log(user)
         req.login(user, (err) => {
             if(err){
                 next(err)
@@ -72,10 +74,10 @@ function logout(req, res) {
 // helper functions
 const authenticate = passport.authenticate('local');
 
-function loginUser(req, res, next) {
+async function loginUser(req, res, next) {
     // passport.authenticate returns a function that we will call with req, res, and a callback function to execute on success   
     console.log('in login user') 
-    authenticate(req, res, () => {
+    await authenticate(req, res, () => {
         console.log('authenticated', req.user.username);
         console.log('session object:', req.session);
         console.log('req.user:', req.user);

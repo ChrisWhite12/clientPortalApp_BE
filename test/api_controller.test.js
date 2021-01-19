@@ -13,7 +13,7 @@ const {
 } = require('./config');
 const { expect } = require('chai');
 
-describe('main test', () => {
+describe('api_utils', () => {
     describe("example test - running api_controller.test.js", () => {
         it("example test", () => {
             (1).should.equal(1);
@@ -21,15 +21,18 @@ describe('main test', () => {
     })
 
     describe("readPatient", () => {
-        it('should return one patient with an email', () => {
+        it('should return one patient with an email', async() => {
             let req = {
                 user: {
                     email: "be@testing.com"
                 }
             }
             let res = {}
-            readPatient(req)
-            expect(res.patient).to.exist
+            await readPatient(req,res)
+            // .then(res)
+            .then((x) => console.log('x',x))
+            // console.log('tv',tempVar)
+            expect(res.patient).to.be.an('object')
         })
         it('should return the correct length of appointments', () => {
 
