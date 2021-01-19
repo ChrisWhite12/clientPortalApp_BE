@@ -18,34 +18,6 @@ describe('main test', () => {
             (1).should.equal(1);
         })
     })
-
-    describe("getUserByEmail", () => {
-        it('should return on entry from email', () => {
-
-        })
-        it('should return null from invalid email', () => {
-
-        })
-    })
-
-    describe("isAdmin", () => {
-        it("should return next() if admin", () => {
-
-        })
-        it("should return 403 status if not admin", () => {
-
-        })
-    })
-
-    describe("isLoggedIn", () => {
-        it("should return next() if logged in", () => {
-
-        })
-        it("should return 403 status if not logged in", () => {
-
-        })
-    })
-
 })
 
 // const isLoggedIn 

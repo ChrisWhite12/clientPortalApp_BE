@@ -35,15 +35,7 @@ describe('main test', () => {
 
         setupData();
     });
-
-    // beforeEach(() => {
-    // })
-
-    // afterEach((done) => {
-        
-    //     done()
-    // })
-
+    
     after((done) => {
         disconnectFromDb(done);
     })
