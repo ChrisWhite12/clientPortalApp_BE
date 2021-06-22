@@ -17,14 +17,17 @@ const register = function (req, res, next) {
     const {email,password} = req.body
     const patId = req.patId
     const role = req.role
+
     const newUserHandler = (user) => {
         console.log('register new user')
         req.login(user, (err) => {
             if(err){
-                next(err)
+                res.send({message: 'error registering'})
+                res.status(401)
             }
             else{
-                res.redirect('/')
+                res.send({message: 'ok register'})
+                res.status(200)
             }
         })
     }
@@ -41,16 +44,16 @@ const register = function (req, res, next) {
                     patId
                 })
                 .then(newUserHandler)
+                .catch(err => console.log(err))
             }
             else{
-                res.status(400)
                 res.json({
                     error: 'Email already exists'
                 })
+                res.status(400)
             }
         })
         .catch(err => console.log(err))
-    // next()
 };
 
 function logout(req, res) {
@@ -76,7 +79,7 @@ function loginUser(req, res, next) {
     // passport.authenticate returns a function that we will call with req, res, and a callback function to execute on success   
     console.log('in login user') 
     authenticate(req, res, () => {
-        console.log('authenticated', req.user.username);
+        console.log('authenticated', req.user.email);
         console.log('session object:', req.session);
         console.log('req.user:', req.user);
         res.status(200);

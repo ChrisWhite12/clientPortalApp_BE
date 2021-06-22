@@ -26,6 +26,6 @@ const User = new Schema({
     }
 })
 
-User.plugin(require('mongoose-bcrypt'));
+User.plugin(require('passport-local-mongoose'));
 
 module.exports = mongoose.model('User', User)

@@ -4,7 +4,7 @@ To setup the app for development, the env variables have to be declared in the .
     
     TEST_EMAIL = '(login for etheral email)'
     TEST_PASS = '(password from etheral email)'
-    API_KEY2 = '(API key that you generate from clinoko)'
+    API_KEY = '(API key that you generate from clinoko)'
 
 To generate the API keys login to cliniko. Click in My Info tab and click Manage API keys.
 
@@ -19,7 +19,7 @@ In the fetch requests in api_controller change the User-Agent to your name and e
     headers: {
     Accept: "application/json",
     'Content-Type': 'application/json',
-    Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+    Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
     "User-Agent": "Chris White (chris_white_12@hotmail.com)",
     }
 

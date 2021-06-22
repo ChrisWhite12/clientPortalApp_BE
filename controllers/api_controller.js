@@ -5,6 +5,7 @@ const { response } = require('express')
 
 const readPatient = (req,res) => {
     let patient_out = {}
+    console.log('req.user',req.user);
     if(req.user != undefined){
         console.log(req.user.email)
         getPatientByEmail(req.user.email)
@@ -19,7 +20,7 @@ const readPatient = (req,res) => {
                 fetch(`${pat_data.patients[0].appointments.links.self}`, {
                     headers: {
                         Accept: "application/json",
-                        Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+                        Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
                         "User-Agent": "Chris White (chris_white_12@hotmail.com)",
                     }
                 })
@@ -28,7 +29,7 @@ const readPatient = (req,res) => {
                     // fetch(app_data.appointments[0].links.self, {
                     //     headers: {
                     //         Accept: "application/json",
-                    //         Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+                    //         Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
                     //         "User-Agent": "Chris White (chris_white_12@hotmail.com)",
                     //     }
                     // })
@@ -66,7 +67,7 @@ const checkUser = (req,res,next) => {
     getPatientByEmail(req.body.email)
     .then(response => response.json())
     .then(pat_data => {
-        console.log(pat_data)
+        // console.log(pat_data)
         if (pat_data.patients.length >= 1){
             // console.log(pat_data.patients[0])
             console.log('checkUser - email exists in cliniko')
@@ -118,7 +119,7 @@ const updatePatient = (req,res) => {
         headers: {
             Accept: "application/json",
             'Content-Type': 'application/json',
-            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         },
         body: JSON.stringify(req.body)
@@ -137,7 +138,7 @@ const getPatientByEmail = (email) => {
     return fetch(`https://api.au2.cliniko.com/v1/patients?q=email:=${email}`, {
         headers: {
             Accept: "application/json",
-            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         }
     })
@@ -148,7 +149,7 @@ const getUserByEmail = (email) => {
     return fetch(`https://api.au2.cliniko.com/v1/users`, {
         headers: {
             Accept: "application/json",
-            Authorization: `Basic ${Base64.encode(process.env.API_KEY2)}`,
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
         }
     })
