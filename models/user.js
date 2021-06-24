@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 // Define User schema
 const User = new Schema({
+    // username:{
+    //     type: String,
+    //     required: true
+    // },
     email:{
         type: String,
         required: true
@@ -16,7 +20,7 @@ const User = new Schema({
     },
     resetToken:{
         type: String,
-        required: false
+        default: ''
     },
     expireToken:{
         type: Date,
@@ -26,6 +30,6 @@ const User = new Schema({
     }
 })
 
-User.plugin(require('passport-local-mongoose'));
+User.plugin(require('mongoose-bcrypt'));
 
 module.exports = mongoose.model('User', User)

@@ -20,6 +20,7 @@
   "dependencies": {
     "@handlebars/allow-prototype-access": "^1.0.3",
     "bcrypt": "^5.0.0",
+    "connect-mongo": "^4.4.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",

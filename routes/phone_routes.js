@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 const MessagingResponse = require('twilio').twiml.MessagingResponse
 
-const client = require('twilio')('AC0f3d76c8a30cf077431cba07e51d1400', 'fdd62804e04703a559e222cd11821b02');
+const client = require('twilio')
+// client(process.env.ACC_SID, process.env.AUTH_TOKEN);
 
 router.post('/', (req, res) =>
 
     client.messages
     .create({
         body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
-        from: '+19293251592',
-        to: '+61497586797'
+        from: process.env.TWILIO_PHONE,
+        to: process.env.PHONE1
     })
     .then(message => {
         console.log(message.sid)

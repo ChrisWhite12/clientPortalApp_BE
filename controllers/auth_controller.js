@@ -1,6 +1,6 @@
 const crypto =require('crypto');
 
-const UserModel = require("../models/user")
+const User = require("../models/user")
 const ProfileModel = require("../models/profile")
 
 const passport = require('passport')
@@ -12,8 +12,7 @@ const {
 } = require('../utils/auth_utils');
 const { getPatientByEmail } = require('./api_controller');
 
-const register = function (req, res, next) {
-    
+const register = async (req, res, next) => {
     const {email,password} = req.body
     const patId = req.patId
     const role = req.role
@@ -22,38 +21,39 @@ const register = function (req, res, next) {
         console.log('register new user')
         req.login(user, (err) => {
             if(err){
-                res.send({message: 'error registering'})
-                res.status(401)
+                next(err)
             }
             else{
-                res.send({message: 'ok register'})
-                res.status(200)
+                res.status(201).json(user)
             }
         })
     }
 
-    UserModel.find({email})
-        .then((exist_user) => {
-            console.log('exist_user',exist_user.length)
-            if(exist_user.length == 0){
-                UserModel.create({
-                    email,
-                    password,
-                    resetToken: '',
-                    role,
-                    patId
-                })
-                .then(newUserHandler)
-                .catch(err => console.log(err))
-            }
-            else{
-                res.json({
-                    error: 'Email already exists'
-                })
-                res.status(400)
-            }
-        })
-        .catch(err => console.log(err))
+    try{
+        console.log('in try ',email)
+        const existUser = await User.findOne({email})
+        if(!existUser){
+            const newUser = await User.create({
+                email,
+                password,
+                resetToken: '',
+                role,
+                patId
+            })
+            newUserHandler(newUser)
+        }
+        else{
+            res.status(400)
+            res.json({
+                error: 'Email already exists'
+            })
+        }
+    }
+    catch (err){
+        console.log('in catch')
+        res.status(400)
+        res.json({message: err.message})
+    }
 };
 
 function logout(req, res) {
@@ -83,7 +83,7 @@ function loginUser(req, res, next) {
         console.log('session object:', req.session);
         console.log('req.user:', req.user);
         res.status(200);
-        res.json({user: req.user, sessionID: req.sessionID});
+        res.json({user: req.user}); // sessionID: req.sessionID}
     });
 }
 
@@ -102,7 +102,7 @@ function forgotPassword(req,res){
             let expToken = new Date(Date.now() + (1000 * 60 * 2))
             console.log('now - ',nowDate.toString(),'expToken - ',expToken.toString())
 
-            UserModel.findOneAndUpdate({"email": req.body.email},{
+            User.findOneAndUpdate({"email": req.body.email},{
                 $set:{
                     resetToken: token,
                     expireToken: expToken
@@ -156,7 +156,7 @@ function forgotPassword(req,res){
 }
 
 function resetToken(req,res){
-    UserModel.findOne({resetToken: req.params.token})
+    User.findOne({resetToken: req.params.token})
     .then((user) => {
         const nowDate = new Date(Date.now())
         console.log(user.expireToken - nowDate)
@@ -185,7 +185,7 @@ function updateUser(req,res){
         else{
             if(user && req.params.token != '' && user.resetToken == req.params.token){
                 console.log('token matches')
-                UserModel.findOneAndUpdate({"email": req.body.email},{
+                User.findOneAndUpdate({"email": req.body.email},{
                     $set:{
                         password: req.body.password,
                         resetToken: null
@@ -250,7 +250,7 @@ function updateUserAdmin(req,res){
         else{
             if(user && req.body.role){
                 console.log('In update user - role')
-                UserModel.findOneAndUpdate({"email": req.body.email},{
+                User.findOneAndUpdate({"email": req.body.email},{
                     $set:{
                         role: req.body.role
                     }
@@ -275,7 +275,7 @@ function updateUserAdmin(req,res){
 }
 
 function readUsers (req,res){
-    UserModel.find()
+    User.find()
     .then((users) => {
         if(users){
             // console.log(users)

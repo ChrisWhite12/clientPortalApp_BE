@@ -5,6 +5,7 @@ const { response } = require('express')
 
 const readPatient = (req,res) => {
     let patient_out = {}
+    console.log('req.body',req.body);
     console.log('req.user',req.user);
     if(req.user != undefined){
         console.log(req.user.email)
@@ -72,7 +73,7 @@ const checkUser = (req,res,next) => {
             // console.log(pat_data.patients[0])
             console.log('checkUser - email exists in cliniko')
             req.patId = pat_data.patients[0].id 
-            req.role = ''
+            req.role = 'user'
             return next()
         }
         else{
@@ -92,7 +93,7 @@ const checkUser = (req,res,next) => {
                 });
                 if(user_found){
                     console.log('checkUser - registered as a practitioner')
-                    req.patId = ''
+                    req.patId = 'none'
                     req.role = 'admin'
                     return next()
                 }

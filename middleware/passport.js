@@ -1,15 +1,19 @@
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
-const UserModel = require('../models/user')
+const LocalStrategy = require('passport-local')
+const User = require('../models/user')
 
 passport.serializeUser((user,done) => {
-    done(null, user._id)             //_id
+    done(null, user.id)             //_id
 })
 
-passport.deserializeUser((userId,done) => {
-    UserModel.findById(userId)
-    .then((user) => done(null,user))
-    .catch(done)
+passport.deserializeUser(async(userId,done) => {
+    try{
+        const user = await User.findById(userId)
+        done(null,user)
+    }
+    catch (err){
+        done(err)
+    }
 })
 
 const canLogin = (user, password) => {
@@ -21,21 +25,20 @@ const canLogin = (user, password) => {
     }
 }
 
-const verifyCallback = (email,password,done) => {
-    UserModel.findOne({email})
-    .then((user) => {
-        if(canLogin(user,password)){
-            return done(null, user)         //success
+const verifyCallback = async (email,password,done) => {
+    try{
+        const findUser = await User.findOne({email})
+        if(canLogin(findUser,password)){
+            return done(null, findUser)         //success
         }
         else{
             return done(null,false)         //unsuccessful
         }
-    })
-    .catch(done)                            //error
+    }
+    catch (err){
+        done(err)
+    }   
 }
 
-//set username to email
-const fields = { usernameField: "email"}
-
 //use local strategy
-passport.use(new LocalStrategy(fields, verifyCallback))
+passport.use(new LocalStrategy({usernameField: "email"}, verifyCallback))

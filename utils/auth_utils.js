@@ -1,7 +1,7 @@
-const UserModel = require('../models/user');
+const User = require('../models/user');
 
 const getUserByEmail = (req) => {
-    return UserModel.findOne({"email": req.body.email})
+    return User.findOne({"email": req.body.email})
 }
 
 const isAdmin = (req,res,next) => {
