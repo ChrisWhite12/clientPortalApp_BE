@@ -83,35 +83,9 @@ require("./middleware/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use((req, res, next) => {
-//     console.log('session ',req.session)
-//     console.log('user ',req.user)
-//     next()
-// })
-
 app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)
-
-// app.get("/test", (req,res) => {
-//     fetch(`https://api.au2.cliniko.com/v1/patients`, {
-//         headers: {
-//             Accept: "application/json",
-//             'Content-Type': 'application/json',
-//             Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
-//             "User-Agent": "Chris White (chris_white_12@hotmail.com)",
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         res.send(data)
-//         res.status(200)
-//     })
-//     .catch(err => console.log(err))
-//     console.log('test route')
-//     // res.send({message: "test"})
-//     // res.status(200)
-// })
 
 // app.use('/phone', phoneRoutes)
 

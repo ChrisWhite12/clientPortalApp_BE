@@ -59,18 +59,9 @@ const register = async (req, res, next) => {
 function logout(req, res) {
     console.log('in logout func')
     req.session.destroy(() => {
-        res.redirect("/");
+        res.sendStatus(200);
     });
 }
-// const logout = function (req, res) {
-//     console.log(req)
-//     req.logout();
-//     console.log('logged out user');
-//     console.log('session object:', req.session);
-//     console.log('req.user:', req.user);
-//     // res.redirect('/user/login')
-//     res.sendStatus(200);
-// }
 
 // helper functions
 const authenticate = passport.authenticate('local');
@@ -83,7 +74,7 @@ function loginUser(req, res, next) {
         console.log('session object:', req.session);
         console.log('req.user:', req.user);
         res.status(200);
-        res.json({user: req.user}); // sessionID: req.sessionID}
+        res.json({user: req.user});
     });
 }
 
@@ -126,11 +117,13 @@ function forgotPassword(req,res){
                 }
             });
 
+            const resetLink = process.env.NODE_ENV === 'production' ? `https://zealous-mcnulty-b23006.netlify.app/reset_password/${token}` : `http://localhost:3000/reset_password/${token}`
+            
             let mailOptions = {
                 from: process.env.TEST_EMAIL,
                 subject: 'Reset Password',
                 to: `${user.email}`,
-                text: `To reset password, click the link below: \n http://localhost:3000/reset_password/${token} \n`
+                html: `<p>To reset password, click the link below: </p> \n <a href=${resetLink}>Reset Password</a> \n`
             }
 
             // console.log(mailOptions)
