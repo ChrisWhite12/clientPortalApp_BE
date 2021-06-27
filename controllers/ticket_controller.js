@@ -9,8 +9,8 @@ const createTicket = function(req,res) {
 				error: err.message
 			})
 		}
-        res.sendStatus(201)
-        console.log(ticket)
+        res.status(201)
+        res.send({ticId: ticket._id})
     })
 }
 

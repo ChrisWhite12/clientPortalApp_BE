@@ -27,12 +27,9 @@ const readPatient = async (req,res) => {
         const pat_data = await patientRes.json()
 
         const curr_date = new Date().toISOString()
-        console.log('curr_date',curr_date)
-        //---filter appointments by after current time (?q=appointment_start:>2020-01-01-T08:30:00Z)-----## UTC
-        // ?q=appointment_start:>${curr_date}
 
         if(pat_data.patients.length >= 1){
-            const appRes = await fetch(`${pat_data.patients[0].appointments.links.self}`, {
+            const appRes = await fetch(`${pat_data.patients[0].appointments.links.self}?q=appointment_start:>${curr_date}`, {
                 headers: {
                     Accept: "application/json",
                     Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
@@ -47,13 +44,37 @@ const readPatient = async (req,res) => {
     
             const app_data = await appRes.json()
 
-            patient_out = {
-                patient: pat_data.patients[0],
-                appointments: app_data.appointments
-            }
-            res.status(200);
-            console.log(patient_out)
-            res.send(patient_out)
+            // console.log('app_data.appoinments',app_data.appointments);
+
+            const appTypePromiseArr = app_data.appointments.map(item => {
+                // console.log('item',item);
+                return fetch(`${item.appointment_type.links.self}`,{
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+                        "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+                    }
+                })
+            })
+
+            Promise.all( appTypePromiseArr )
+            .then(res => Promise.all(res.map(r => r.json())))
+            .then(resData =>{
+                console.log('resData',resData);
+                const updateApp = resData.map((el,ind) => {
+                    return {...app_data.appointments[ind], appTypeName: el.name}
+                })
+                return updateApp
+            })
+            .then( updateApp => {
+                patient_out = {
+                    patient: pat_data.patients[0],
+                    appointments: updateApp
+                }
+                res.status(200);
+                res.send(patient_out)
+            })
+
         }
         else{
             console.log('no user found')
