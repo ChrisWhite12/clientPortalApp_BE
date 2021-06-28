@@ -1,5 +1,5 @@
 
-const {addTicket, findTicket, updateTicket, deleteTicket} = require('../utils/ticket_utils')
+const {addTicket, findTicket, findTickets, updateTicket, deleteTicket} = require('../utils/ticket_utils')
 
 const createTicket = function(req,res) {
     addTicket(req).save((err,ticket) => {

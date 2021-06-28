@@ -58,7 +58,7 @@ mongoose.connect(dbConn, {
 app.enable('trust proxy')
 
 const sessionConfig = {
-    secret: process.env.SESSION_SECRET || 'express',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     proxy:true,
