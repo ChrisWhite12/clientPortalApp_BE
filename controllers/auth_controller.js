@@ -15,6 +15,7 @@ const { getPatientByEmail } = require('./api_controller');
 const register = async (req, res, next) => {
     const {email,password} = req.body
     const patId = req.patId
+    const pracId = req.pracId
     const role = req.role
 
     const newUserHandler = (user) => {
@@ -38,7 +39,8 @@ const register = async (req, res, next) => {
                 password,
                 resetToken: '',
                 role,
-                patId
+                patId,
+                pracId
             })
             newUserHandler(newUser)
         }

@@ -113,23 +113,34 @@ const checkUser = async (req,res,next) => {
     else{
         
         const userByEmail =  await getUsers()
+        const getPrac = await getPractitioners()
 
-        if(!userByEmail.ok){
+        if(!userByEmail.ok || !getPrac.ok){
             res.status(404)
             res.json({error: 'Error - fetching user by email'})
         }
 
-        const prac_data = await userByEmail.json()
+        const user_data = await userByEmail.json()
+        const prac_data = await getPrac.json()
 
-        console.log('prac data', prac_data)
 
         let user_found = false
 
-        prac_data.users.forEach(element => {
-            console.log(element.email)
-            if(element.email == req.body.email){
+        user_data.users.forEach(userItem => {
+            if(userItem.email == req.body.email){
                 console.log('user found')
                 user_found = true
+
+                prac_data.practitioners.forEach(pracItem => {
+                    //if prac_data.practitioners[ind].user === `https://api.au2.cliniko.com/v1/users/${userId}`
+                    if(pracItem.user.links.self === `https://api.au2.cliniko.com/v1/users/${userItem.id}`){
+                        console.log('found prac - ', pracItem.id);
+                        req.pracId = pracItem.id
+                    }
+                    //set the pracId
+
+                });
+                
             }
         });
         if(user_found){
@@ -161,7 +172,6 @@ const updatePatient = (req,res) => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data.address_1)
         res.sendStatus(200)
     })
     .catch(err => console.log(err))
@@ -180,16 +190,42 @@ const getPatientByEmail = (email) => {
 
 const getUsers = () => {
     return fetch(`https://api.au2.cliniko.com/v1/users`, {
-    headers: {
-        Accept: "application/json",
-        Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
-        "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        }
+    })
+}
+
+const getPractitioners = async (req, res) => {
+    console.log('in getPrac func')
+
+    const curr_date = new Date().toISOString()
+    const pracRes = await fetch(`https://api.au2.cliniko.com/v1/practitioners/${req.params.id}/appointments?q=appointment_start:>${curr_date}`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        }
+    })
+
+    if(!pracRes.ok){
+        res.status(404)
+        res.json({error: 'Error - fetching practitioner appointments'})
     }
-})
+
+    const prac_data = await pracRes.json()
+
+    console.log('prac_data',prac_data);
+
+    res.status(200)
+    res.send(prac_data)
 }
 
 module.exports = {
     readPatient,
+    getPractitioners,
     checkUser,
     updatePatient
 }

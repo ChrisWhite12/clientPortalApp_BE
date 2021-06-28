@@ -27,6 +27,9 @@ const User = new Schema({
     },
     patId:{
         type: String
+    },
+    pracId:{
+        type: String
     }
 })
 
