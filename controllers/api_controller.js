@@ -217,10 +217,32 @@ const getPractitioners = async (req, res) => {
 
     const prac_data = await pracRes.json()
 
-    console.log('prac_data',prac_data);
+    const appTypePromiseArr = prac_data.appointments.map(item => {
+        return fetch(`${item.appointment_type.links.self}`,{
+            headers: {
+                Accept: "application/json",
+                Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+                "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+            }
+        })
+    })
 
-    res.status(200)
-    res.send(prac_data)
+    Promise.all( appTypePromiseArr )
+    .then(res => Promise.all(res.map(r => r.json())))
+    .then(resData =>{
+        const updateApp = resData.map((el,ind) => {
+            return {...prac_data.appointments[ind], appTypeName: el.name}
+        })
+        return updateApp
+    })
+    .then( updatePrac => {
+        patient_out = {
+            // practitioner: ,
+            appointments: updatePrac
+        }
+        res.status(200);
+        res.send(patient_out)
+    })
 }
 
 module.exports = {
