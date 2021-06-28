@@ -8,12 +8,10 @@ const addTicket = (req) => {
 
 const getAllTickets = () => {
     tickets = TicketModel.find()
-    // console.log('getTickets - ',tickets)
     return tickets
 }
 
-const findTicket = (req) => {
-    console.log('email: '+ req.user.email)
+const findTickets = (req) => {
     if(req.user.role == 'admin'){
         console.log('admin')
         return TicketModel.find()
@@ -23,8 +21,12 @@ const findTicket = (req) => {
     }
 }
 
+const findTicket = (req) => {
+    console.log('req.params.appId',req.params.appId);
+    return TicketModel.findOne({appId: req.params.appId})
+}
+
 const updateTicket = (req) => {
-    console.log('id -> ', req.params)
     return TicketModel.findByIdAndUpdate(req.params.id, req.body, {
         new: true
     });
@@ -36,6 +38,7 @@ const deleteTicket = (req) => {
 
 module.exports = {
     getAllTickets,
+    findTickets,
     findTicket,
     addTicket,
     updateTicket,

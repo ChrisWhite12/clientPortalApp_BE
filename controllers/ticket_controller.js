@@ -14,6 +14,19 @@ const createTicket = function(req,res) {
     })
 }
 
+const readTickets = function(req,res){
+    console.log('read tickets - controller')
+    findTickets(req).exec((err,ticket) => {
+        if (err) {
+			res.status(500)
+			res.json({
+				error: err.message
+			})
+        }
+        res.send(ticket)
+    })
+}
+
 const readTicket = function(req,res){
     console.log('read ticket - controller')
     findTicket(req).exec((err,ticket) => {
@@ -24,7 +37,6 @@ const readTicket = function(req,res){
 			})
         }
         res.send(ticket)
-        console.log(ticket)
     })
 }
 
@@ -39,7 +51,6 @@ const changeTicket = function(req,res){
         }
         res.status(200)
         res.send(ticket)
-        console.log(ticket)
     })
 
 }
@@ -58,6 +69,7 @@ const removeTicket = function(req,res){
 
 module.exports = {
     createTicket,
+    readTickets,
     readTicket,
     changeTicket,
     removeTicket
