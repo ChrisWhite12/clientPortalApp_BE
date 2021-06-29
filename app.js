@@ -87,7 +87,7 @@ app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
 app.use('/ticket', ticketRoutes)
 
-// app.use('/phone', phoneRoutes)
+app.use('/phone', phoneRoutes)
 
 const server = app.listen(port, () => {
     console.log('listening on port:' + port)

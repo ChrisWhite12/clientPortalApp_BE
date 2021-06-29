@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const MessagingResponse = require('twilio').twiml.MessagingResponse
 
-const client = require('twilio')
-// client(process.env.ACC_SID, process.env.AUTH_TOKEN);
 
-router.post('/', (req, res) =>
-
+router.post('/', (req, res) => {
+    const client = require('twilio')(process.env.ACC_SID, process.env.AUTH_TOKEN)
+    console.log('in phone post request - ', req.body)
+    // client('AC0f3d76c8a30cf077431cba07e51d1400', 'c3b0570ec95f0a6a6780456f85f4c704')
+    // client(process.env.ACC_SID, process.env.AUTH_TOKEN)
     client.messages
     .create({
-        body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
+        body: req.body.text,
         from: process.env.TWILIO_PHONE,
         to: process.env.PHONE1
     })
@@ -20,12 +21,6 @@ router.post('/', (req, res) =>
     })
     .catch(err => console.log('err',err))
 
-)
-
-router.post('/sms', (req,res) => {
-
-    console.log('req ===== ',req.body.Body);
-    res.sendStatus(200)
 })
 
 module.exports = router
