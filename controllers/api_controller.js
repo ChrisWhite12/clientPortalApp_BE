@@ -13,10 +13,9 @@ const { response } = require('express')
 
 const readPatient = async (req,res) => {
     let patient_out = {}
-    console.log('req.body',req.body);
-    console.log('req.user',req.user);
+    console.log('readPatient req.body',req.body);
+    console.log('readPatient req.user',req.user);
     if(req.user != undefined){
-        console.log(req.user.email)
         const patientRes = await getPatientByEmail(req.user.email)
 
         if(!patientRes.ok){
@@ -44,10 +43,7 @@ const readPatient = async (req,res) => {
     
             const app_data = await appRes.json()
 
-            // console.log('app_data.appoinments',app_data.appointments);
-
             const appTypePromiseArr = app_data.appointments.map(item => {
-                // console.log('item',item);
                 return fetch(`${item.appointment_type.links.self}`,{
                     headers: {
                         Accept: "application/json",
@@ -60,7 +56,6 @@ const readPatient = async (req,res) => {
             Promise.all( appTypePromiseArr )
             .then(res => Promise.all(res.map(r => r.json())))
             .then(resData =>{
-                console.log('resData',resData);
                 const updateApp = resData.map((el,ind) => {
                     return {...app_data.appointments[ind], appTypeName: el.name}
                 })
@@ -102,16 +97,13 @@ const checkUser = async (req,res,next) => {
 
     const pat_data = await patByEmail.json()
 
-    // console.log(pat_data)
     if (pat_data.patients.length >= 1){
-        // console.log(pat_data.patients[0])
         console.log('checkUser - email exists in cliniko')
         req.patId = pat_data.patients[0].id 
         req.role = 'user'
         return next()
     }
     else{
-        
         const userByEmail =  await getUsers()
         const getPrac = await getPractitioners()
 
@@ -132,9 +124,7 @@ const checkUser = async (req,res,next) => {
                 user_found = true
 
                 prac_data.practitioners.forEach(pracItem => {
-                    //if prac_data.practitioners[ind].user === `https://api.au2.cliniko.com/v1/users/${userId}`
                     if(pracItem.user.links.self === `https://api.au2.cliniko.com/v1/users/${userItem.id}`){
-                        console.log('found prac - ', pracItem.id);
                         req.pracId = pracItem.id
                     }
                     //set the pracId
@@ -199,8 +189,6 @@ const getUsers = () => {
 }
 
 const getPractitioners = async (req, res) => {
-    console.log('in getPrac func')
-
     const curr_date = new Date().toISOString()
     const pracRes = await fetch(`https://api.au2.cliniko.com/v1/practitioners/${req.params.id}/appointments?q=appointment_start:>${curr_date}`, {
         headers: {

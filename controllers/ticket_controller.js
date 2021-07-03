@@ -15,7 +15,6 @@ const createTicket = function(req,res) {
 }
 
 const readTickets = function(req,res){
-    console.log('read tickets - controller')
     findTickets(req).exec((err,ticket) => {
         if (err) {
 			res.status(500)
@@ -28,7 +27,6 @@ const readTickets = function(req,res){
 }
 
 const readTicket = function(req,res){
-    console.log('read ticket - controller')
     findTicket(req).exec((err,ticket) => {
         if (err) {
 			res.status(500)
@@ -41,7 +39,6 @@ const readTicket = function(req,res){
 }
 
 const changeTicket = function(req,res){
-    console.log('updating ticket - controller')
     updateTicket(req).exec((err,ticket) => {
         if (err) {
 			res.status(500)

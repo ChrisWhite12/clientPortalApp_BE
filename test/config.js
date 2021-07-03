@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
 
-// set up connection for test database
-const dbConn = 'mongodb://localhost/clientportal_test'
 
 const connectToDb = () => {
     // Connect to the database (same as we do in app.js)
     // mongoose.disconnect()
-    mongoose.connect(dbConn, {
+    mongoose.connect(process.env.MONGODB_URI_TEST, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,

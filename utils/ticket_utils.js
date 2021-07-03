@@ -1,7 +1,7 @@
 const TicketModel = require('../models/ticket')
 
 const addTicket = (req) => {
-    console.log(req.user._id)
+    console.log('add ticket req.user._id -',req.user._id)
     req.body.userId = req.user._id
     return new TicketModel(req.body)
 }
@@ -13,7 +13,6 @@ const getAllTickets = () => {
 
 const findTickets = (req) => {
     if(req.user.role == 'admin'){
-        console.log('admin')
         return TicketModel.find()
     }
     else{
@@ -22,7 +21,6 @@ const findTickets = (req) => {
 }
 
 const findTicket = (req) => {
-    console.log('req.params.appId',req.params.appId);
     return TicketModel.findOne({appId: req.params.appId})
 }
 

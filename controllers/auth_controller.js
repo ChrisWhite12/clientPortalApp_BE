@@ -31,7 +31,6 @@ const register = async (req, res, next) => {
     }
 
     try{
-        console.log('in try ',email)
         const existUser = await User.findOne({email})
         if(!existUser){
             const newUser = await User.create({
@@ -52,14 +51,12 @@ const register = async (req, res, next) => {
         }
     }
     catch (err){
-        console.log('in catch')
         res.status(400)
         res.json({message: err.message})
     }
 };
 
 function logout(req, res) {
-    console.log('in logout func')
     req.session.destroy(() => {
         res.sendStatus(200);
     });
@@ -70,7 +67,6 @@ const authenticate = passport.authenticate('local');
 
 function loginUser(req, res, next) {
     // passport.authenticate returns a function that we will call with req, res, and a callback function to execute on success   
-    console.log('in login user') 
     authenticate(req, res, () => {
         console.log('authenticated', req.user.email);
         console.log('session object:', req.session);
@@ -81,9 +77,6 @@ function loginUser(req, res, next) {
 }
 
 function forgotPassword(req,res){
-    // console.log(req.body)
-    // console.log(req.body.email)
-
     getUserByEmail(req).exec((err,user) => {
         if (err) {
             res.status(404)
@@ -93,7 +86,6 @@ function forgotPassword(req,res){
             const token = crypto.randomBytes(20).toString('hex')
             let nowDate = new Date(Date.now())
             let expToken = new Date(Date.now() + (1000 * 60 * 2))
-            console.log('now - ',nowDate.toString(),'expToken - ',expToken.toString())
 
             User.findOneAndUpdate({"email": req.body.email},{
                 $set:{
@@ -108,7 +100,6 @@ function forgotPassword(req,res){
                     console.log('updated user')
                 }
             })
-            // console.log(token)
 
             const transporter = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
@@ -128,20 +119,15 @@ function forgotPassword(req,res){
                 html: `<p>To reset password, click the link below: </p> \n <a href=${resetLink}>Reset Password</a> \n`
             }
 
-            // console.log(mailOptions)
-
             transporter.sendMail(mailOptions, (err,res) => {
                 if(err){
                     console.log(`ERROR: ${err}`)
                     res.sendStatus(400)
                 }
                 else{
-                    // console.log(res)
                     res.status(200).send({message:'recovery mail sent'})
                 }
-            })
-            res.sendStatus(200)
-            
+            })            
         }
         else{
             res.sendStatus(400)
@@ -154,9 +140,7 @@ function resetToken(req,res){
     User.findOne({resetToken: req.params.token})
     .then((user) => {
         const nowDate = new Date(Date.now())
-        console.log(user.expireToken - nowDate)
         if(user && ((user.expireToken - nowDate) > 0)){
-            console.log('expToken - ',user.expireToken)
             res.status(200).send({message: 'link ok'})
         }
         else{
@@ -164,13 +148,11 @@ function resetToken(req,res){
         }
     })
     .catch((err) => {
-        console.log(err)
         res.status(401).send({message: 'link not ok'})
     })
 }
 
 function updateUser(req,res){
-    // console.log('token', req.params.token)
     //find user
     getUserByEmail(req).exec((err,user) => {
         if (err) {
@@ -217,12 +199,10 @@ function updateUser(req,res){
                                 res.sendStatus(400)
                             }
                             else{
-                                // console.log(res)
                                 res.status(200).send({message:'recovery mail sent'})
                             }
                         })
-
-                        res.status(200).send("password set")
+                        // res.status(200).send("password set")
                     }
                 })
             }
@@ -235,7 +215,6 @@ function updateUser(req,res){
 }
 
 function updateUserAdmin(req,res){
-    // console.log('token', req.params.token)
     //find user
     getUserByEmail(req).exec((err,user) => {
         if (err) {
@@ -273,7 +252,6 @@ function readUsers (req,res){
     User.find()
     .then((users) => {
         if(users){
-            // console.log(users)
             res.status(200).send(users)
         }
         else{

@@ -31,12 +31,12 @@ app.use(cors({
 }));
 
 //---------------------------------------------------DB---------------------------------------------
-if(process.env.NODE_ENV == 'test'){
-    dbConn = 'mongodb://localhost/clientportal_test'
+if(process.env.NODE_ENV === 'test'){
+    dbConn = process.env.MONGODB_URI_TEST
     console.log('testing database')
 }
 else{
-    dbConn = process.env.MONGODB_URI  || 'mongodb://localhost/clientportal'
+    dbConn = process.env.MONGODB_URI
     console.log('normal database')
 }
 
@@ -53,6 +53,7 @@ mongoose.connect(dbConn, {
         console.log('Connected to database!');
     }
 });
+
 
 //-----------------------------------------------session----------------------------------------------
 app.enable('trust proxy')

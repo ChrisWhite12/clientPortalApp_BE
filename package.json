@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha test/main.test.js",
     "start": "nodemon --delay 500ms app.js"
   },
   "repository": {
