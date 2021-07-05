@@ -15,6 +15,7 @@ const ticketRoutes = require('./routes/ticket_routes')
 const apiRoutes = require("./routes/api_routes")
 const phoneRoutes = require('./routes/phone_routes')
 const { Base64 } = require('js-base64')
+const { isLoggedIn } = require('./utils/auth_utils')
 
 require('dotenv').config()
 //--------------------------------------------------Cors-----------------------------------------
@@ -84,11 +85,10 @@ require("./middleware/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/api', apiRoutes)
 app.use('/user', authRoutes)
-app.use('/ticket', ticketRoutes)
-
-app.use('/phone', phoneRoutes)
+app.use('/api', isLoggedIn, apiRoutes)
+app.use('/ticket', isLoggedIn, ticketRoutes)
+app.use('/phone', isLoggedIn, phoneRoutes)
 
 const server = app.listen(port, () => {
     console.log('listening on port:' + port)

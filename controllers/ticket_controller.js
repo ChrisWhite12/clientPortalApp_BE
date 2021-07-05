@@ -3,14 +3,17 @@ const {addTicket, findTicket, findTickets, updateTicket, deleteTicket} = require
 
 const createTicket = function(req,res) {
     addTicket(req).save((err,ticket) => {
+        console.log('ticket',ticket);
         if (err) {
-			res.status(500)
-			res.json({
-				error: err.message
-			})
-		}
-        res.status(201)
-        res.send({ticId: ticket._id})
+            res.status(500)
+            res.json({
+                error: err.message
+            })
+        }
+        else{
+            res.status(201)
+            res.send({ticId: ticket._id})
+        }
     })
 }
 
@@ -22,7 +25,10 @@ const readTickets = function(req,res){
 				error: err.message
 			})
         }
-        res.send(ticket)
+        else{
+            res.status(200)
+            res.send(ticket)
+        }
     })
 }
 
@@ -34,7 +40,10 @@ const readTicket = function(req,res){
 				error: err.message
 			})
         }
-        res.send(ticket)
+        else{
+            res.status(200)
+            res.send(ticket)
+        }
     })
 }
 
@@ -46,8 +55,10 @@ const changeTicket = function(req,res){
 				error: err.message
 			})
         }
-        res.status(200)
-        res.send(ticket)
+        else{
+            res.status(200)
+            res.send(ticket)
+        }
     })
 
 }
@@ -60,7 +71,9 @@ const removeTicket = function(req,res){
                 error: err.message
             })
         }
-        res.sendStatus(204)
+        else{
+            res.sendStatus(204)
+        }
     })
 }
 

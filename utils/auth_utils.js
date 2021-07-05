@@ -11,7 +11,7 @@ const isAdmin = (req,res,next) => {
 
 const isLoggedIn = (req,res,next) => {
     if (req.user) return next();
-    else res.sendStatus(403);
+    else res.sendStatus(401);
 }
 
 module.exports = {

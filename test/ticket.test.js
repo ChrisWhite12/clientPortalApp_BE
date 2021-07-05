@@ -1,3 +1,96 @@
+const chai = require('chai')
+const User = require('../models/user')
+
+let should = chai.should()
+process.env.NODE_ENV = 'test'
+
+const { app } = require('../app')
+const chaiHttp = require('chai-http')
+chai.use(chaiHttp)
+
+const agent = chai.request.agent(app)
+
+
+//create Ticket, correct parameters
+describe('Ticket test', function(){
+
+    it('should login with correct details', function(done) {
+        agent.post('/user/login')
+        .send({
+            email: 'be2@testing.com',
+            password: 'asdf123'
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    it('should create a ticket', function(done) {
+        agent.post('/ticket')
+        .send({
+            appId: '1234',
+            appDate: new Date(),
+            status: 'pending',
+            notified: false
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(201)
+            done()
+        })
+    })
+
+    it('shouldn\'t create a ticket with incorrect details', function(done) {
+        agent.post('/ticket')
+        .send({
+            foo: 'bar'
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(500)
+            done()
+        })
+    })
+
+    it("should logout", function(done) {
+        agent.get('/user/logout')
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    it('shouldn\'t create a ticket with no user', function(done) {
+        agent.post('/ticket')
+        .send({
+            appId: '1234',
+            appDate: new Date(),
+            status: 'pending',
+            notified: false
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
+
+//read Tickets - admin
+
+//read Tickets - user
+
+//read Ticket - appId correct
+
+//change Ticket - correct details
+
+//change Ticket - incorrect Id
+
+//delete Ticket - correct Id
+
+//delete Ticket - incorrect Id
+
+//-------------------------------------------------------------
+
 
 // process.env.NODE_ENV = 'test'
 
@@ -185,20 +278,3 @@
 //     // console.log("tic3 - ",tic3)
 // }
 
-// //create Ticket, correct parameters
-
-// //create Ticket, incorrect parameters
-
-// //read Tickets - admin
-
-// //read Tickets - user
-
-// //read Ticket - appId correct
-
-// //change Ticket - correct details
-
-// //change Ticket - incorrect Id
-
-// //delete Ticket - correct Id
-
-// //delete Ticket - incorrect Id

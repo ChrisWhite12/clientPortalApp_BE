@@ -15,80 +15,75 @@ const readPatient = async (req,res) => {
     let patient_out = {}
     console.log('readPatient req.body',req.body);
     console.log('readPatient req.user',req.user);
-    if(req.user != undefined){
-        const patientRes = await getPatientByEmail(req.user.email)
+    const patientRes = await getPatientByEmail(req.user.email)
 
-        if(!patientRes.ok){
+    if(!patientRes.ok){
+        res.status(404)
+        res.json({error: 'Error - fetching patient by email'})
+    }
+
+    const pat_data = await patientRes.json()
+
+    const curr_date = new Date().toISOString()
+
+    if(pat_data.patients.length >= 1){
+        const appRes = await fetch(`${pat_data.patients[0].appointments.links.self}?q=appointment_start:>${curr_date}`, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+                "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+            }
+        })
+
+        if(!appRes.ok){
             res.status(404)
-            res.json({error: 'Error - fetching patient by email'})
+            res.json({error: 'Error - fetching patient appointments'})
         }
 
-        const pat_data = await patientRes.json()
+        const app_data = await appRes.json()
 
-        const curr_date = new Date().toISOString()
-
-        if(pat_data.patients.length >= 1){
-            const appRes = await fetch(`${pat_data.patients[0].appointments.links.self}?q=appointment_start:>${curr_date}`, {
+        const appTypePromiseArr = app_data.appointments.map(item => {
+            return fetch(`${item.appointment_type.links.self}`,{
                 headers: {
                     Accept: "application/json",
                     Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
                     "User-Agent": "Chris White (chris_white_12@hotmail.com)",
                 }
             })
+        })
 
-            if(!appRes.ok){
-                res.status(404)
-                res.json({error: 'Error - fetching patient appointments'})
-            }
-    
-            const app_data = await appRes.json()
-
-            const appTypePromiseArr = app_data.appointments.map(item => {
-                return fetch(`${item.appointment_type.links.self}`,{
-                    headers: {
-                        Accept: "application/json",
-                        Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
-                        "User-Agent": "Chris White (chris_white_12@hotmail.com)",
-                    }
-                })
+        Promise.all( appTypePromiseArr )
+        .then(res => Promise.all(res.map(r => r.json())))
+        .then(resData =>{
+            const updateApp = resData.map((el,ind) => {
+                return {...app_data.appointments[ind], appTypeName: el.name}
             })
-
-            Promise.all( appTypePromiseArr )
-            .then(res => Promise.all(res.map(r => r.json())))
-            .then(resData =>{
-                const updateApp = resData.map((el,ind) => {
-                    return {...app_data.appointments[ind], appTypeName: el.name}
-                })
-                return updateApp
-            })
-            .then( updateApp => {
-                patient_out = {
-                    patient: pat_data.patients[0],
-                    appointments: updateApp
-                }
-                res.status(200);
-                res.send(patient_out)
-            })
-
-        }
-        else{
-            console.log('no user found')
+            return updateApp
+        })
+        .then( updateApp => {
             patient_out = {
-                patient: 'null',
-                appointments: []
+                patient: pat_data.patients[0],
+                appointments: updateApp
             }
             res.status(200);
             res.send(patient_out)
-        }
+        })
+
     }
     else{
-        console.log('no user defined')
-        res.sendStatus(400)
+        console.log('no user found')
+        patient_out = {
+            patient: 'null',
+            appointments: []
+        }
+        res.status(200);
+        res.send(patient_out)
     }
 }
 
 const checkUser = async (req,res,next) => {
     const patByEmail = await getPatientByEmail(req.body.email)
+    // console.log('patByEmail',patByEmail);
 
     if(!patByEmail.ok){
         res.status(404)
@@ -96,6 +91,13 @@ const checkUser = async (req,res,next) => {
     }
 
     const pat_data = await patByEmail.json()
+
+    // console.log('pat_data',pat_data);
+
+    if(pat_data.patients.length < 1){
+        res.status(401)
+        res.json({error: 'Error - fetching patient by email'})
+    }
 
     if (pat_data.patients.length >= 1){
         console.log('checkUser - email exists in cliniko')

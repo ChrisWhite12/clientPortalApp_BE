@@ -1,6 +1,7 @@
 const TicketModel = require('../models/ticket')
 
 const addTicket = (req) => {
+    console.log('req.user',req.user);
     console.log('add ticket req.user._id -',req.user._id)
     req.body.userId = req.user._id
     return new TicketModel(req.body)

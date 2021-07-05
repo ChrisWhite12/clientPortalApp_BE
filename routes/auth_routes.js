@@ -9,11 +9,11 @@ const { isAdmin, isLoggedIn } = require('../utils/auth_utils')
 
 router.post('/register', checkUser, register)
 router.post('/login', login);
-router.get('/logout', logout);
+router.get('/logout', isLoggedIn, logout);
 router.post('/forgot_password', forgotPassword)
 router.get('/reset/:token', resetToken)
 router.put('/:token',updateUser)
 router.get('/', isLoggedIn, isAdmin, readUsers)
-router.put('/',updateUserAdmin)
+router.put('/', isLoggedIn, updateUserAdmin)
 
 module.exports = router

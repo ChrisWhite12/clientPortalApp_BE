@@ -25,7 +25,7 @@ const register = async (req, res, next) => {
                 next(err)
             }
             else{
-                res.status(201).json(user)
+                res.sendStatus(201)
             }
         })
     }
@@ -68,9 +68,9 @@ const authenticate = passport.authenticate('local');
 function loginUser(req, res, next) {
     // passport.authenticate returns a function that we will call with req, res, and a callback function to execute on success   
     authenticate(req, res, () => {
-        console.log('authenticated', req.user.email);
-        console.log('session object:', req.session);
-        console.log('req.user:', req.user);
+        // console.log('authenticated', req.user.email);
+        // console.log('session object:', req.session);
+        // console.log('req.user:', req.user);
         res.status(200);
         res.json({user: req.user});
     });
@@ -84,7 +84,6 @@ function forgotPassword(req,res){
         }
         else if(user){
             const token = crypto.randomBytes(20).toString('hex')
-            let nowDate = new Date(Date.now())
             let expToken = new Date(Date.now() + (1000 * 60 * 2))
 
             User.findOneAndUpdate({"email": req.body.email},{
@@ -119,18 +118,20 @@ function forgotPassword(req,res){
                 html: `<p>To reset password, click the link below: </p> \n <a href=${resetLink}>Reset Password</a> \n`
             }
 
-            transporter.sendMail(mailOptions, (err,res) => {
+            transporter.sendMail(mailOptions, (err,res2) => {
                 if(err){
                     console.log(`ERROR: ${err}`)
                     res.sendStatus(400)
                 }
                 else{
-                    res.status(200).send({message:'recovery mail sent'})
+                    // console.log('res2',res2);
+                    res.status(200)
+                    res.json({message:'recovery mail sent'})
                 }
             })            
         }
         else{
-            res.sendStatus(400)
+            res.sendStatus(401)
         }
 
     })        
@@ -141,14 +142,14 @@ function resetToken(req,res){
     .then((user) => {
         const nowDate = new Date(Date.now())
         if(user && ((user.expireToken - nowDate) > 0)){
-            res.status(200).send({message: 'link ok'})
+            res.status(200).json({message: 'link ok'})
         }
         else{
-            res.status(401).send({message: 'link not ok'})
+            res.status(401).json({message: 'link not ok'})
         }
     })
     .catch((err) => {
-        res.status(401).send({message: 'link not ok'})
+        res.status(401).json({message: 'link not ok'})
     })
 }
 
@@ -157,10 +158,10 @@ function updateUser(req,res){
     getUserByEmail(req).exec((err,user) => {
         if (err) {
             res.status(404)
-            res.send("User not found")
+            res.json({message: "User not found"})
         }
         else{
-            if(user && req.params.token != '' && user.resetToken == req.params.token){
+            if(user && req.params.token !== '' && user.resetToken == req.params.token){
                 console.log('token matches')
                 User.findOneAndUpdate({"email": req.body.email},{
                     $set:{
@@ -193,7 +194,7 @@ function updateUser(req,res){
                             text: `Your password has been reset for BrainTrain dashboard \n`
                         }
             
-                        transporter.sendMail(mailOptions, (err,res) => {
+                        transporter.sendMail(mailOptions, (err,res2) => {
                             if(err){
                                 console.log(`ERROR: ${err}`)
                                 res.sendStatus(400)
@@ -202,7 +203,6 @@ function updateUser(req,res){
                                 res.status(200).send({message:'recovery mail sent'})
                             }
                         })
-                        // res.status(200).send("password set")
                     }
                 })
             }

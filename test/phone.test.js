@@ -10,10 +10,6 @@ chai.use(chaiHttp)
 
 const agent = chai.request.agent(app)
 
-after(done => {
-    agent.close()
-    done()
-})
 
 describe("example test - running phone.test.js", () => {
     it("example test", () => {
@@ -28,16 +24,16 @@ describe('phone should send text', function () {
         loginUser(done)
     })
 
-    it('should send ok back', (done) => {
-        agent.post('/phone')
-        .send({
-            text: 'testing message'
-        })
-        .end((err, res) => {
-            res.should.have.property('status').equal(200)
-            done()
-        })
-    })
+    // it('should send ok back', (done) => {
+    //     agent.post('/phone')
+    //     .send({
+    //         text: 'testing message'
+    //     })
+    //     .end((err, res) => {
+    //         res.should.have.property('status').equal(200)
+    //         done()
+    //     })
+    // })
 })
 
 describe("phone shouldn't send text with no user", () => {

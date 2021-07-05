@@ -13,9 +13,22 @@ const agent = chai.request.agent(app)
 
 before((done) => {    
     mongoose.connection.once('open',() => {
-        registerUser(done)
+        agent.post('/user/register')
+        .send({
+            email: 'be@testing.com',
+            password: 'asdf123'
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(201)
+            done()
+        })
     })    
 });
+
+after(done => {
+    agent.close()
+    done()
+})
 
 after((done) => {
     mongoose.connection.db.dropCollection('users', () => {
@@ -37,14 +50,14 @@ describe("phone tests", () => {
     require('./phone.test.js')
 })
 
-const registerUser = (done) => {
-    agent.post('/user/register')
-    .send({
-        email: 'be@testing.com',
-        password: 'asdf123'
-    })
-    .end((err, res) => {
-        res.should.have.property('status').equal(201)
-        done()
-    })
-}
+describe("auth tests", () => {
+    require('./auth.test.js')
+})
+
+describe("ticket tests", () => {
+    require('./ticket.test.js')
+})
+
+describe("api tests", () => {
+    require("./api.test.js")
+})
