@@ -124,7 +124,6 @@ function forgotPassword(req,res){
                     res.sendStatus(400)
                 }
                 else{
-                    // console.log('res2',res2);
                     res.status(200)
                     res.json({message:'recovery mail sent'})
                 }
@@ -208,7 +207,7 @@ function updateUser(req,res){
             }
             else{
                 res.status(404)
-                res.send("User not found")
+                res.json("User not found")
             }
         }
     })

@@ -76,7 +76,7 @@ const readPatient = async (req,res) => {
             patient: 'null',
             appointments: []
         }
-        res.status(200);
+        res.status(404);
         res.send(patient_out)
     }
 }
@@ -93,12 +93,7 @@ const checkUser = async (req,res,next) => {
     const pat_data = await patByEmail.json()
 
     // console.log('pat_data',pat_data);
-
-    if(pat_data.patients.length < 1){
-        res.status(401)
-        res.json({error: 'Error - fetching patient by email'})
-    }
-
+    
     if (pat_data.patients.length >= 1){
         console.log('checkUser - email exists in cliniko')
         req.patId = pat_data.patients[0].id 
@@ -152,6 +147,7 @@ const checkUser = async (req,res,next) => {
 }
 
 const updatePatient = (req,res) => {
+    console.log('req.user.patId',req.user.patId);
     fetch(`https://api.au2.cliniko.com/v1/patients/${req.user.patId}`, {
         method: 'PUT',
         headers: {
@@ -166,7 +162,10 @@ const updatePatient = (req,res) => {
     .then(data => {
         res.sendStatus(200)
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        console.log(err)
+        res.sendStatus(400)
+    })
 
 }
 
@@ -190,9 +189,21 @@ const getUsers = () => {
     })
 }
 
+
 const getPractitioners = async (req, res) => {
+    return fetch(`https://api.au2.cliniko.com/v1/practitioners`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
+            "User-Agent": "Chris White (chris_white_12@hotmail.com)",
+        }
+    })
+}
+
+const getPractitionersApp = async (req, res) => {
     const curr_date = new Date().toISOString()
-    const pracRes = await fetch(`https://api.au2.cliniko.com/v1/practitioners/${req.params.id}/appointments?q=appointment_start:>${curr_date}`, {
+    console.log('req.user.pracId - ',req.user.pracId)
+    const pracRes = await fetch(`https://api.au2.cliniko.com/v1/practitioners/${req.user.pracId}/appointments?q=appointment_start:>${curr_date}`, {
         headers: {
             Accept: "application/json",
             Authorization: `Basic ${Base64.encode(process.env.API_KEY)}`,
@@ -238,6 +249,7 @@ const getPractitioners = async (req, res) => {
 module.exports = {
     readPatient,
     getPractitioners,
+    getPractitionersApp,
     checkUser,
     updatePatient
 }

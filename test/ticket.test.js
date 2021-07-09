@@ -12,19 +12,9 @@ const agent = chai.request.agent(app)
 
 
 //create Ticket, correct parameters
-describe('Ticket test', function(){
+describe('createTicket', function(){
 
-    it('should login with correct details', function(done) {
-        agent.post('/user/login')
-        .send({
-            email: 'be2@testing.com',
-            password: 'asdf123'
-        })
-        .end((err, res) => {
-            res.should.have.property('status').equal(200)
-            done()
-        })
-    })
+    it("should login user", function(done){loginUser(done)})
 
     it('should create a ticket', function(done) {
         agent.post('/ticket')
@@ -35,6 +25,7 @@ describe('Ticket test', function(){
             notified: false
         })
         .end((err, res) => {
+            // console.log('create Ticket res',res.body);
             res.should.have.property('status').equal(201)
             done()
         })
@@ -51,13 +42,7 @@ describe('Ticket test', function(){
         })
     })
 
-    it("should logout", function(done) {
-        agent.get('/user/logout')
-        .end((err, res) => {
-            res.should.have.property('status').equal(200)
-            done()
-        })
-    })
+    it("should logout user", function(done){logoutUser(done)})
 
     it('shouldn\'t create a ticket with no user', function(done) {
         agent.post('/ticket')
@@ -74,12 +59,50 @@ describe('Ticket test', function(){
     })
 })
 
+describe('readTicket test', function(){
 
-//read Tickets - admin
+    it("should login user", function(done){loginUser(done)})
 
-//read Tickets - user
+    it('should read tickets', function(done) {
+        agent.get('/ticket')
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
 
-//read Ticket - appId correct
+    it("should logout user", function(done){logoutUser(done)})
+
+    it('shouldn\'t read tickets logged out', function(done) {
+        agent.get('/ticket')
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
+const loginUser = (done) => {
+    agent.post('/user/login')
+    .send({
+        email: 'be@testing.com',
+        password: 'asdf123'
+    })
+    .end((err, res) => {
+        res.should.have.property('status').equal(200)
+        done()
+    })
+}
+
+const logoutUser = (done) => {
+    agent.get('/user/logout')
+    .end((err, res) => {
+        res.should.have.property('status').equal(200)
+        done()
+    })
+}
+
+//TODO create ticket and get id
 
 //change Ticket - correct details
 

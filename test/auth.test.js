@@ -11,9 +11,10 @@ chai.use(chaiHttp)
 const agent = chai.request.agent(app)
 
 //should be able to register with correct details
-describe("register", () => {    
+describe("register", function (){
 
-    it('should login with valid user', (done) =>{
+    it('should register with valid user', function(done){
+        this.timeout(5000)
         agent.post('/user/register')
         .send({
             email: 'be2@testing.com',
@@ -24,16 +25,29 @@ describe("register", () => {
             done()
         })
     })
+
+    it('it should register practitioner', function(done) {
+        this.timeout(5000)
+        agent.post('/user/register')
+        .send({
+            email: 'chris_white_12@hotmail.com',
+            password: 'asdf123'
+        })
+        .end((err, res) => {
+            res.should.have.property('status').equal(201)
+            done()
+        })
+    })
     
     it("shouldn't register with invalid user", function (done){
-        this.timeout(10000)
         agent.post('/user/register')
         .send({
             email: 'asdf@asdf.com',
             password: 'asdf123'
         })
         .end((err, res) => {
-            res.should.have.property('status').equal(401)
+            console.log('res.body ',res.body )
+            res.should.have.property('status').equal(400)
             done()
         })
     })
@@ -88,7 +102,7 @@ describe("forgot password", () => {
             email: 'be2@testing.com'
         })
         .end((err, res) => {
-            console.log('res.body',res.body);
+            // console.log('res.body',res.body);
             res.should.have.property('status').equal(200)
             done()
         })
@@ -110,20 +124,109 @@ describe("forgot password", () => {
 
 })
 
-
+//get reset token from user details
 //reset token - correct details
+describe('resetToken test', function(){
 
-//reset token - no user
+    let token1 = ''
 
-//reset token - expired token
+    it('should be ok if token is valid', function(done) {
+        User.findOne({email: 'be2@testing.com'}).exec((err,user) => {
+            token1 = user.resetToken
+            agent.get(`/user/reset/${user.resetToken}`)
+            .end((err, res) => {
+                if(err){
+                    console.log('err',err);
+                }
+                res.should.have.property('status').equal(200)
+                done()
+            })
+        })
+    })
 
-//token updateUser - token matches and updates user
 
-//token updateUser - no user
+    it('shouldn\'t be ok if token is invalid', function(done) {
+        agent.get(`/user/reset/sdvkmsdfawejf`)
+        .end((err, res) => {
+            if(err){
+                console.log('err',err);
+            }
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
 
-//token updateUser - token doesn't match
+    it('shouldn\'t update user, if no user', function(done) {
+        agent.put(`/user/askjdna`)
+        .send({
+            email: 'alsdasdkjfsk',
+            password: 'newone'
+        })
+        .end((err, res) => {
+            if(err){
+                console.log('err',err);
+            }
+            res.should.have.property('status').equal(404)
+            done()
+        })
+    })
 
+    it('shouldn\'t update user, if token invalid', function(done) {
+        agent.put(`/user/askjdna`)
+        .send({
+            email: 'be2@testing.com',
+            password: 'newone'
+        })
+        .end((err, res) => {
+            if(err){
+                console.log('err',err);
+            }
+            res.should.have.property('status').equal(404)
+            done()
+        })
+    })
 
+    it('should update user, if token matches', function(done) {
+        this.timeout(10000)
+        agent.put(`/user/${token1}`)
+        .send({
+            email: 'be2@testing.com',
+            password: 'newone'
+        })
+        .end((err, res) => {
+            if(err){
+                console.log('err',err);
+            }
+            console.log('res.body',res.body);
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    it('shouldn\'t update afterwards', function(done) {
+        this.timeout(10000)
+        agent.put(`/user/${token1}`)
+        .send({
+            email: 'be2@testing.com',
+            password: 'warning'
+        })
+        .end((err, res) => {
+            if(err){
+                console.log('err',err);
+            }
+            console.log('res.body',res.body);
+            res.should.have.property('status').equal(404)
+            done()
+        })
+    })
+
+})
+
+//checkUser - if patient
+
+//checkUser - if practitioner
+
+//checkUser - invalid user
 
 // chai.use(sinonChai)
 
@@ -236,10 +339,6 @@ describe("forgot password", () => {
 
 // }
 
-//checkUser - if patient
 
-//checkUser - if practitioner
-
-//checkUser - invalid user
 
 

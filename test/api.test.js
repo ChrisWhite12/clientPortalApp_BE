@@ -32,33 +32,162 @@ describe("example test - running api_controller.test.js", () => {
 
 // const { expect } = require('chai');
 
-// describe('api controller test', () => {
 
-//     // describe("readPatient", () => {
-//     //     it('should return one patient with an email', async () => {
-//     //         let req = {
-//     //             user: {
-//     //                 email: "test@test.com"
-//     //             }
-//     //         }
-//     //         let res = {}
-//     //         const res1 = await readPatient(req)
-//     //         console.log('res',res);
-//     //         console.log('res1',res1);
-//     //         expect(res.patient).to.exist
-//     //     })
-//     // })
+describe('readPatient test', function(){
 
-// })
+    //login to be@testing
+    it('should login user', function(done){
+        loginUserPat(done)
+    })
+    
+    //readPatient - user exists
+    it('should read the patient for valid email', function(done) {
+        agent.get('/api/patient')
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            res.body.patient.should.have.property('first_name').equal('be')
+            res.body.patient.should.have.property('last_name').equal('testing')
+            done()
+        })
+    })
+    
+    //logout
+    it('should logout', function(done){
+        logoutUser(done)
+    })
 
-//readPatient - user exists
+    it('should login user', function(done){
+        loginUserPrac(done)
+    })
 
-//readPatient - no user
+    //readPatient - practitioner
+    it('shouldn\'t read patient for practitioner', function(done) {
+        agent.get('/api/patient')
+        .end((err, res) => {
+            res.should.have.property('status').equal(404)
+            done()
+        })
+    })
 
-//get practitioners - correct pracId
+    it('should logout', function(done){
+        logoutUser(done)
+    })
+})
 
-//get practitioners - incorrect pracId
+describe('getPracApp test', function(){
+    //login cw12@hm
+    it('should login user', function(done){
+        loginUserPrac(done)
+    })
 
-//updatePatient - correct patId
+    //get practitioners appointment
+    it('should get the practictioners appointments', function(done) {
+        agent.get('/api/practitioner/appointments')
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
 
-//updatePatient - incorrect patId
+    //logout
+    it('should logout', function(done){
+        logoutUser(done)
+    })
+
+    //get practitioners appointment - no user
+    it('shouldn\'t get the practictioners appointments if logged out', function(done) {
+        agent.get('/api/practitioner/appointments')
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
+describe('updatePatient test', function(){
+    
+    //login be@testing
+    it('should login user', function(done){
+        this.timeout(5000)
+        loginUserPat(done)
+    })
+
+    //updatePatient
+    it('should update patient details', function(done) {
+        agent.put('/api/patient')
+        .send({"first_name": 'testtest'})
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    //readPatient
+    it('should read the patient for valid email', function(done) {
+        agent.get('/api/patient')
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            res.body.patient.should.have.property('first_name').equal('testtest')
+            res.body.patient.should.have.property('last_name').equal('testing')
+            done()
+        })
+    })
+
+    //updatePatient
+    it('should update patient details', function(done) {
+        agent.put('/api/patient')
+        .send({"first_name": 'be'})
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    //logout
+    it('should logout', function(done){
+        logoutUser(done)
+    })
+
+    //updatePatient - no user
+    it('shouldn\'t update patient details if logged out', function(done) {
+        agent.put('/api/patient')
+        .send({first_name: 'be'})
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
+
+const loginUserPat = (done) => {
+    agent.post('/user/login')
+    .send({
+        email: 'be@testing.com',
+        password: 'asdf123'
+    })
+    .end((err, res) => {
+        res.should.have.property('status').equal(200)
+        done()
+    })
+}
+
+const loginUserPrac = (done) => {
+    agent.post('/user/login')
+    .send({
+        email: 'chris_white_12@hotmail.com',
+        password: 'asdf123'
+    })
+    .end((err, res) => {
+        res.should.have.property('status').equal(200)
+        done()
+    })
+}
+
+const logoutUser = (done) => {
+    agent.get('/user/logout')
+    .end((err, res) => {
+        res.should.have.property('status').equal(200)
+        done()
+    })
+}

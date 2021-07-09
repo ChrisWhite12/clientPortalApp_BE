@@ -3,7 +3,6 @@ const {addTicket, findTicket, findTickets, updateTicket, deleteTicket} = require
 
 const createTicket = function(req,res) {
     addTicket(req).save((err,ticket) => {
-        console.log('ticket',ticket);
         if (err) {
             res.status(500)
             res.json({
