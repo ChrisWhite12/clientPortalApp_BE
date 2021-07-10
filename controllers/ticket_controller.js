@@ -71,7 +71,7 @@ const removeTicket = function(req,res){
             })
         }
         else{
-            res.sendStatus(204)
+            res.sendStatus(200)
         }
     })
 }

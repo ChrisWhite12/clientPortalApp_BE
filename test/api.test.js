@@ -16,23 +16,6 @@ describe("example test - running api_controller.test.js", () => {
     })
 })
 
-
-// const mongoose = require('mongoose');
-// const {readPatient, checkUser, updatePatient } = require('../controllers/api_controller')
-// const Ticket = require('../models/ticket');
-// const request = require('supertest')
-
-// process.env.NODE_ENV = 'test'
-
-// const { app } = require('../app')
-
-// const chai = require('chai')
-// let chaiHttp = require('chai-http')
-// // const agent = chai.request.agent(app)
-
-// const { expect } = require('chai');
-
-
 describe('readPatient test', function(){
 
     //login to be@testing
@@ -114,6 +97,7 @@ describe('updatePatient test', function(){
 
     //updatePatient
     it('should update patient details', function(done) {
+        this.timeout(5000)
         agent.put('/api/patient')
         .send({"first_name": 'testtest'})
         .end((err, res) => {
@@ -135,6 +119,7 @@ describe('updatePatient test', function(){
 
     //updatePatient
     it('should update patient details', function(done) {
+        this.timeout(5000)
         agent.put('/api/patient')
         .send({"first_name": 'be'})
         .end((err, res) => {

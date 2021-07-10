@@ -13,8 +13,8 @@ const { response } = require('express')
 
 const readPatient = async (req,res) => {
     let patient_out = {}
-    console.log('readPatient req.body',req.body);
-    console.log('readPatient req.user',req.user);
+    // console.log('readPatient req.body',req.body);
+    // console.log('readPatient req.user',req.user);
     const patientRes = await getPatientByEmail(req.user.email)
 
     if(!patientRes.ok){
@@ -83,16 +83,14 @@ const readPatient = async (req,res) => {
 
 const checkUser = async (req,res,next) => {
     const patByEmail = await getPatientByEmail(req.body.email)
-    // console.log('patByEmail',patByEmail);
 
     if(!patByEmail.ok){
         res.status(404)
         res.json({error: 'Error - fetching patient by email'})
+        console.log('Error - fetching patient by email')
     }
 
     const pat_data = await patByEmail.json()
-
-    // console.log('pat_data',pat_data);
     
     if (pat_data.patients.length >= 1){
         console.log('checkUser - email exists in cliniko')
@@ -101,6 +99,7 @@ const checkUser = async (req,res,next) => {
         return next()
     }
     else{
+
         const userByEmail =  await getUsers()
         const getPrac = await getPractitioners()
 
@@ -202,7 +201,7 @@ const getPractitioners = async (req, res) => {
 
 const getPractitionersApp = async (req, res) => {
     const curr_date = new Date().toISOString()
-    console.log('req.user.pracId - ',req.user.pracId)
+    // console.log('req.user.pracId - ',req.user.pracId)
     const pracRes = await fetch(`https://api.au2.cliniko.com/v1/practitioners/${req.user.pracId}/appointments?q=appointment_start:>${curr_date}`, {
         headers: {
             Accept: "application/json",

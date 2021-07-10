@@ -38,8 +38,8 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^6.1.0",
-    "sinon": "^9.2.3",
-    "sinon-chai": "^3.5.0",
+    "sinon": "^9.2.4",
+    "sinon-chai": "^3.7.0",
     "twilio": "^3.63.1"
   },
   "devDependencies": {

@@ -10,6 +10,9 @@ chai.use(chaiHttp)
 
 const agent = chai.request.agent(app)
 
+let tic1Id = ''
+let tic2Id = ''
+
 
 //create Ticket, correct parameters
 describe('createTicket', function(){
@@ -25,7 +28,22 @@ describe('createTicket', function(){
             notified: false
         })
         .end((err, res) => {
-            // console.log('create Ticket res',res.body);
+            tic1Id = res.body.ticId
+            res.should.have.property('status').equal(201)
+            done()
+        })
+    })
+
+    it('should create a ticket', function(done) {
+        agent.post('/ticket')
+        .send({
+            appId: '2341',
+            appDate: new Date(),
+            status: 'pending',
+            notified: false
+        })
+        .end((err, res) => {
+            tic2Id = res.body.ticId
             res.should.have.property('status').equal(201)
             done()
         })
@@ -66,6 +84,7 @@ describe('readTicket test', function(){
     it('should read tickets', function(done) {
         agent.get('/ticket')
         .end((err, res) => {
+            res.body.length.should.be.equal(2)
             res.should.have.property('status').equal(200)
             done()
         })
@@ -81,6 +100,93 @@ describe('readTicket test', function(){
         })
     })
 })
+
+describe('updateTicket test', function(){
+    it("should login user", function(done){loginUser(done)})
+    
+    //change Ticket - correct details
+    it('should update with correct details', function(done) {
+        agent.put(`/ticket/${tic1Id}`)
+        .send({
+            status: 'accepted'
+        })   
+        .end((err, res) => {
+            res.body.should.have.property('status').equal('accepted')
+            res.body.should.have.property('appId').equal('1234')
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+    //change Ticket - incorrect Id
+    it('shouldn\'t update with wrong id', function(done) {
+        agent.put(`/ticket/12984`)
+        .send({
+            status: 'accepted'
+        })   
+        .end((err, res) => {
+            res.should.have.property('status').equal(500)
+            done()
+        })
+    })
+
+    it("should logout user", function(done){logoutUser(done)})
+
+    it('shouldn\'t update when logged out', function(done) {
+        agent.put(`/ticket/${tic1Id}`)
+        .send({
+            status: 'rejected'
+        })   
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
+describe('deleteTicket test', function(){
+    
+    it("should login user", function(done){loginUser(done)})
+    
+    //delete Ticket - correct Id
+    it('should delete ticket with correct Id', function(done) {
+        agent.delete(`/ticket/${tic1Id}`)
+        .end((err, res) => {
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+    
+    //delete Ticket - incorrect Id
+    it('shouldn\'t delete ticket with incorrect Id', function(done) {
+        agent.delete(`/ticket/123012`)
+        .end((err, res) => {
+            res.should.have.property('status').equal(500)
+            done()
+        })
+    })
+
+    it('should read tickets', function(done) {
+        agent.get('/ticket')
+        .end((err, res) => {
+            res.body.length.should.be.equal(1)
+            res.should.have.property('status').equal(200)
+            done()
+        })
+    })
+
+
+    it("should logout user", function(done){logoutUser(done)})
+
+    it('shouldn\'t delete ticket when logged out', function(done) {
+        agent.delete(`/ticket/${tic2Id}`)
+        .end((err, res) => {
+            res.should.have.property('status').equal(401)
+            done()
+        })
+    })
+})
+
 
 const loginUser = (done) => {
     agent.post('/user/login')
@@ -101,203 +207,3 @@ const logoutUser = (done) => {
         done()
     })
 }
-
-//TODO create ticket and get id
-
-//change Ticket - correct details
-
-//change Ticket - incorrect Id
-
-//delete Ticket - correct Id
-
-//delete Ticket - incorrect Id
-
-//-------------------------------------------------------------
-
-
-// process.env.NODE_ENV = 'test'
-
-// const mongoose = require('mongoose');
-// const { findTicket, getAllTickets, updateTicket, deleteTicket } = require('../utils/ticket_utils');
-// const Ticket = require('../models/ticket');
-// const User = require('../models/user')
-// const request = require('supertest')
-// var {app} = require('../app')
-
-// let chai = require('chai')
-// let chaiHttp = require('chai-http')
-// let should = chai.should()
-
-// const {
-//     connectToDb,
-//     disconnectFromDb
-// } = require('./config');
-// const user = require('../models/user');
-// const { deleteOne } = require('../models/ticket');
-
-// var user1 = {}
-// var user2 = {}
-// var user3 = {}
-// var tic1 = {}
-// var tic2 = {}
-// var tic3 = {}
-
-// describe('ticket utils test', () => {
-    
-//     // Use done to deal with asynchronous code - done is called when the hooks completes
-//     before(async () => {
-//         // await connectToDb();
-//         mongoose.connection.on( err => {
-//             console.log('error connecting to db')
-//         })
-//         await Ticket.deleteMany()
-//         await User.deleteMany()
-//         await setupData();
-//     });
-
-//     after(() => {
-//         disconnectFromDb();
-//     })
-    
-//     describe("example test - running ticket_util.test.js", () => {
-//         it("example test", () => {
-//             (1).should.equal(1);
-//         })
-//     })
-
-//     describe("getAllTickets", () => {
-//         it('should have a length of 3', () => {
-//             getAllTickets().exec((err,tic) => {
-//                 console.log(`tic test - ${tic}`)
-//                 console.log(`err test - ${err}`)
-
-//                 tic.should.have.length(3)
-//                 if(err){
-//                     console.log(err)
-//                 }
-//             })
-//         })
-//     })
-
-//     describe("find tickets", () => {
-//         it('should find tickets matching to patient', () => {
-//             // const response = request(app).get('/ticket')
-//             const req = {
-//                 user: {
-//                     _id: user1._id,
-//                     email: user1.email
-//                 }
-//             }
-//             findTicket(req).exec((err,tic) => {
-//                 tic.should.have.length(2)
-//             })
-//         })
-//         it('should find all tickets as admin', () => {
-//             const req = {
-//                 user: {
-//                     _id: user2._id,
-//                     email: user2.email,
-//                     role: 'admin'
-//                 }
-//             }
-//             findTicket(req).exec((err,tic) => {
-//                 // console.log(tic)
-//                 tic.should.have.length(3)
-//             })
-//         })
-//     })
-
-//     describe("update tickets", () => {
-//         it('should update ticket to accept', () => {
-//             const req = {
-//                 params: {
-//                     id: tic1._id
-//                 },
-//                 body: {
-//                     status: 'accepted'
-//                 }
-//             }
-//             updateTicket(req).exec((err,tic) => {
-                
-//                 if(err){
-//                     console.log(err)
-//                 }
-//                 else{
-//                     console.log('update', tic)
-//                 }
-//             })
-//         })
-//     })
-
-//     describe("delete tickets", () => {
-//         it("should delete a ticket", () => {
-//             req = {
-//                 params: {
-//                     id: tic2._id
-//                 }
-//             }
-//             deleteTicket(req).exec((err,tic) => {
-//                 if(err){
-//                     console.log(err)
-//                 }
-//                 else{
-//                     console.log('deleted')
-//                 }
-//             })
-//         })
-//     })
-
-// })
-
-
-// // Setup and tear down functions
-// const setupData = async () => {
-//     // create patient user
-//     user1 = await User.create({
-//         email: 'test@test.com',
-//         password: 'testtest',
-//         resetToken: '',
-//         role: ''
-//     })
-
-//     // create practitioner user
-//     user2 = await User.create({
-//         email: 'chris_white_12@hotmail.com',
-//         password: 'testtest',
-//         resetToken: '',
-//         role: 'admin'
-//     })
-
-//     user3 = await User.create({
-//         email: 'user3@test.com',
-//         password: 'testtest',
-//         resetToken: '',
-//         role: ''
-//     })
-    
-//     tic1 = await Ticket.create({
-//         appId: 'tic1',
-//         userId: user1._id,
-//         appDate: new Date(2021, 1, 1, 8, 0, 0),
-//         status: 'requested',
-//         notified: false
-//     })
-
-//     tic2 = await Ticket.create({
-//         appId: 'tic2',
-//         userId: user1._id,
-//         appDate: new Date(2021, 1, 1, 9, 0, 0),
-//         status: 'requested',
-//         notified: false
-//     })
-
-//     tic3 = await Ticket.create({
-//         appId: 'tic3',
-//         userId: user3._id,
-//         appDate: new Date(2021, 1, 1, 10, 0, 0),
-//         status: 'requested',
-//         notified: false
-//     })
-//     // console.log("tic3 - ",tic3)
-// }
-

@@ -48,7 +48,6 @@ describe("phone shouldn't send text with no user", () => {
             text: 'testing message'
         })
         .end((err, res) => {
-            console.log('res.body',res.body);
             res.should.have.property('status').equal(401)
             done()
         })
