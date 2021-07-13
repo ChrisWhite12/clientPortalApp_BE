@@ -1,7 +1,6 @@
 const crypto =require('crypto');
 
 const User = require("../models/user")
-const ProfileModel = require("../models/profile")
 
 const passport = require('passport')
 const nodemailer = require('nodemailer')
