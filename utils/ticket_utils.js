@@ -12,7 +12,7 @@ const getAllTickets = () => {
 
 const findTickets = (req) => {
     if(req.user.role == 'admin'){
-        return TicketModel.find()
+        return TicketModel.find()           
     }
     else{
         return TicketModel.find({userId: req.user._id})

@@ -5,7 +5,6 @@ const ProfileModel = require("../models/profile")
 
 const passport = require('passport')
 const nodemailer = require('nodemailer')
-const bcrypt = require('bcrypt')
 
 const {
     getUserByEmail

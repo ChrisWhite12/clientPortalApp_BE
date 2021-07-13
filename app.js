@@ -85,6 +85,7 @@ require("./middleware/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
+//------------------------------------------------------Routes--------------------------------------------------------
 app.use('/user', authRoutes)
 app.use('/api', isLoggedIn, apiRoutes)
 app.use('/ticket', isLoggedIn, ticketRoutes)

@@ -236,12 +236,12 @@ const getPractitionersApp = async (req, res) => {
         return updateApp
     })
     .then( updatePrac => {
-        patient_out = {
+        prac_out = {
             // practitioner: ,
-            appointments: updatePrac
+            appointments: updatePrac 
         }
         res.status(200);
-        res.send(patient_out)
+        res.send(prac_out)
     })
 }
 
